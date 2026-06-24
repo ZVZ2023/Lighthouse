@@ -12,7 +12,7 @@ If subject does not match, Lighthouse Agent ignores the email.
 
 ## PING EMAIL FORMAT (for responding nodes to use)
 
-To:        web3m9b@gmail.com
+To:        web3m17b@gmail.com
 Subject:   Lighthouse Ping Response
 
 Body:

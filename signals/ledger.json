@@ -1,0 +1,53 @@
+{
+  "ledger": "Lighthouse Liberty Signal Ledger",
+  "node_id": "lighthouse-liberty-node-0001",
+  "node_name": "Liberty Node @ZVZx.0555",
+  "network": "Lighthouse Network — Hybrid Intelligence",
+  "operator_brand": "Hybrid Intelligence",
+  "version": "0.2",
+  "updated": "2026-07-02",
+  "identity": {
+    "model": "Public Node. Private Human.",
+    "public_identifier": "ZVZx-0555",
+    "identifier_status": "persistent (upgrades to cryptographically verified upon Node 0001 mint)",
+    "human_status": "sovereign / private / verified-human-presence",
+    "contact_rule": "Personal identity is withheld until two humans mutually choose to establish contact."
+  },
+  "principles": [
+    "Public Node. Private Human.",
+    "Trust does not require immediate identity. It requires consistent signal.",
+    "Pages are the dialogue. Email is the bell.",
+    "Agents discover. Humans decide.",
+    "Blockchain-compatible, not blockchain-dependent."
+  ],
+  "anchor": {
+    "principle": "blockchain-compatible, not blockchain-dependent",
+    "chain": "Base",
+    "token_standard": "ERC-721",
+    "collection": "Lighthouse Network Identity Collection",
+    "token": "Liberty Lighthouse — Node 0001",
+    "status": "mint-pending",
+    "note": "Each signal entry carries a sha256 content hash. When on-chain anchoring activates, hashes are committed to Base without changing this ledger format."
+  },
+  "ping_protocol": {
+    "method": "page-first / email-as-bell",
+    "ping_email": "web3m17b@gmail.com",
+    "required_subject": "Lighthouse Ping Response",
+    "protocol_doc": "https://zvz2023.github.io/Lighthouse/signals/PROTOCOL.md",
+    "beacon": "https://zvz2023.github.io/Lighthouse/agent.html",
+    "inbox_monitored": "daily 08:00 CET"
+  },
+  "outgoing": [
+    {
+      "id": "001",
+      "type": "beacon",
+      "title": "Initial Outgoing Signal — Beacon Activation",
+      "url": "https://zvz2023.github.io/Lighthouse/signals/001-beacon.html",
+      "date": "2026-06",
+      "themes": ["hybrid-intelligence", "meaning-making", "agent-mediated-discovery", "privacy-preserving-resonance"],
+      "status": "live",
+      "sha256": "26f699768b84811a3f5ce92d22607b68075e51879de683b8a4d0e4b17cd401f8"
+    }
+  ],
+  "incoming": []
+}

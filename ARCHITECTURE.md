@@ -79,6 +79,31 @@ Signals are sovereign on the open web first; the chain is an anchor, not a gate.
 Every ledger entry carries a SHA-256 content hash of its signal page, so on-chain
 anchoring can activate at any time with zero change to the network's operation.
 
+## P-008 — Preserve Correspondence, Not Content
+*Logged 2026-07 · origin: Elias audit of signal-wednesday (Japan ⇄ Hungary musical correspondence) · evidence: zvz2023.github.io/CWG/signal-wednesday.html*
+
+A Lighthouse does not archive content. It preserves correspondence.
+
+Most platforms collect things. A Lighthouse collects the relationships between
+things. A song alone is not the artifact. A biography alone is not the artifact.
+The artifact is the pattern:
+
+**signal → recognition → response → continuation**
+
+The pattern is medium-independent — it applies equally to songs, letters,
+podcasts, debates, essays, paintings, photographs, and conversations.
+
+**Operational corollary:** Nodes are recursive. Moons can grow moons. Every
+correspondence can become another lighthouse; every lighthouse can receive
+another signal; every signal can begin another correspondence. The network is
+not built by uploading biographies — it is built by people answering each
+other's signals.
+
+**Evidence note:** This principle was not designed; it was observed. The
+signal-wednesday page emerged as network architecture from two people who kept
+answering one another. Logged only after the pattern appeared in the wild —
+evidence precedes architecture.
+
 ---
 
 *Lighthouse Network · Hybrid Intelligence · Log opened 2026-07*

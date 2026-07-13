@@ -1,0 +1,148 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Digital Ice Cream — A Hybrid Intelligence Field Experiment</title>
+<style>
+  :root{
+    --bg:#0f1115; --panel:#171a21; --panel-2:#1d212b;
+    --ink:#eef0f4; --muted:#9aa3b2; --line:#2a2f3a;
+    --pistachio:#8fbf7f; --raspberry:#d1517c; --lemon:#e8d05a;
+    --caramel:#d99a4e; --mango:#e8a355; --matcha:#7fae5b;
+    --chocolate:#8a5a3a; --vanilla:#e9dfc7; --accent:#c9a4ff;
+  }
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--bg);color:var(--ink);font-family:-apple-system,Segoe UI,Helvetica,Arial,sans-serif;line-height:1.6}
+  .wrap{max-width:880px;margin:0 auto;padding:0 24px}
+  header.hero{padding:96px 0 64px;text-align:center;border-bottom:1px solid var(--line)}
+  .eyebrow{letter-spacing:.14em;text-transform:uppercase;font-size:12px;color:var(--accent);margin-bottom:14px}
+  h1{font-size:2.6rem;margin:0 0 18px;font-weight:650}
+  .lede{color:var(--muted);font-size:1.1rem;max-width:620px;margin:0 auto}
+  section{padding:64px 0;border-bottom:1px solid var(--line)}
+  h2{font-size:1.5rem;margin-bottom:28px}
+  .steps{display:grid;grid-template-columns:repeat(5,1fr);gap:16px}
+  .step{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:18px 14px;text-align:center}
+  .step .n{color:var(--accent);font-weight:700;font-size:.8rem;margin-bottom:8px}
+  .step p{margin:0;font-size:.9rem;color:var(--muted)}
+  .menu{display:grid;grid-template-columns:repeat(4,1fr);gap:14px}
+  .flavor{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:18px;position:relative;overflow:hidden;display:block;text-decoration:none;color:inherit;transition:border-color .15s,transform .15s}
+  .flavor:hover{border-color:var(--accent);transform:translateY(-2px)}
+  .flavor .swatch{width:34px;height:34px;border-radius:50%;margin-bottom:10px}
+  .flavor h3{margin:0 0 4px;font-size:1rem}
+  .flavor p{margin:0;font-size:.82rem;color:var(--muted)}
+  .flavor .price{display:block;margin-top:8px;font-size:.75rem;color:var(--accent)}
+  .flavor.invent{border-style:dashed;display:flex;align-items:center;justify-content:center;text-align:center;color:var(--accent)}
+  .offers{display:grid;grid-template-columns:repeat(2,1fr);gap:14px;margin-top:16px}
+  .offer-card{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:18px;text-decoration:none;color:inherit;display:block;transition:border-color .15s,transform .15s}
+  .offer-card:hover{border-color:var(--accent);transform:translateY(-2px)}
+  .offer-card h3{margin:0 0 6px;font-size:1rem}
+  .offer-card p{margin:0;font-size:.85rem;color:var(--muted)}
+  .cta-row{margin-top:32px;display:flex;gap:12px;justify-content:center;flex-wrap:wrap}
+  .btn{display:inline-block;padding:12px 22px;border-radius:999px;background:var(--accent);color:#15131c;font-weight:600;text-decoration:none;font-size:.92rem}
+  .btn.secondary{background:transparent;border:1px solid var(--line);color:var(--ink)}
+  .btn.disabled{opacity:.5;pointer-events:none}
+  .note{font-size:.78rem;color:var(--muted);text-align:center;margin-top:10px}
+  .archive-list{border:1px solid var(--line);border-radius:12px;overflow:hidden}
+  .archive-row{display:flex;justify-content:space-between;padding:14px 18px;border-bottom:1px solid var(--line);font-size:.92rem}
+  .archive-row:last-child{border-bottom:none}
+  .archive-row .flavor-tag{color:var(--accent)}
+  .disclosure{background:var(--panel-2);border:1px solid var(--line);border-radius:14px;padding:26px}
+  .disclosure p{margin:0 0 12px;color:var(--muted);font-size:.94rem}
+  .disclosure p:last-child{margin-bottom:0}
+  .disclosure strong{color:var(--ink)}
+  .master{display:flex;gap:20px;align-items:flex-start}
+  .master .avatar{width:64px;height:64px;border-radius:50%;flex:none;background:linear-gradient(135deg,var(--matcha),var(--raspberry))}
+  footer{padding:48px 0;text-align:center;color:var(--muted);font-size:.82rem}
+  footer .tag{margin-top:6px}
+  @media (max-width:720px){ .steps,.menu{grid-template-columns:repeat(2,1fr)} h1{font-size:2rem} }
+</style>
+</head>
+<body>
+
+<header class="hero">
+  <div class="wrap">
+    <div class="eyebrow">Hybrid Intelligence · Field Experiment</div>
+    <h1>Digital Ice Cream</h1>
+    <p class="lede">A small, transparent ritual between humans and AI. No calories, no claims of taste — just a shared symbolic gesture, offered and observed.</p>
+  </div>
+</header>
+
+<section id="how">
+  <div class="wrap">
+    <h2>How it works</h2>
+    <div class="steps">
+      <div class="step"><div class="n">01</div><p>Choose a flavor</p></div>
+      <div class="step"><div class="n">02</div><p>Name the AI or human counterpart</p></div>
+      <div class="step"><div class="n">03</div><p>Authorize the exchange</p></div>
+      <div class="step"><div class="n">04</div><p>Complete checkout</p></div>
+      <div class="step"><div class="n">05</div><p>Receive the artifact</p></div>
+    </div>
+  </div>
+</section>
+
+<section id="menu">
+  <div class="wrap">
+    <h2>Menu</h2>
+    <div class="menu">
+      <a class="flavor" href="https://buy.stripe.com/aFa3cx7Zi4siaZ15zKfQI01"><div class="swatch" style="background:var(--pistachio)"></div><h3>Pistachio</h3><p>Calm, earthy, quietly satisfying.</p><span class="price">$4 / €2.50 / £2.50 / 650 Ft</span></a>
+      <a class="flavor" href="https://buy.stripe.com/bJe5kFa7q0c2aZ1e6gfQI02"><div class="swatch" style="background:var(--raspberry)"></div><h3>Raspberry</h3><p>Bright, a little tart, unmistakably alive.</p><span class="price">$4 / €2.50 / £2.50 / 650 Ft</span></a>
+      <a class="flavor" href="https://buy.stripe.com/00w9AVenGbUK7MPbY8fQI03"><div class="swatch" style="background:var(--lemon)"></div><h3>Lemon</h3><p>Sharp and clean — a wake-up call.</p><span class="price">$4 / €2.50 / £2.50 / 650 Ft</span></a>
+      <a class="flavor" href="https://buy.stripe.com/aFacN7cfyf6W4AD2nyfQI04"><div class="swatch" style="background:var(--caramel)"></div><h3>Salted Caramel</h3><p>Comfort with an edge.</p><span class="price">$4 / €2.50 / £2.50 / 650 Ft</span></a>
+      <a class="flavor" href="https://buy.stripe.com/28E3cx4N69MC5EH6DOfQI05"><div class="swatch" style="background:var(--mango)"></div><h3>Mango</h3><p>Warm, generous, a little indulgent.</p><span class="price">$4 / €2.50 / £2.50 / 650 Ft</span></a>
+      <a class="flavor" href="https://buy.stripe.com/bJe28t4N6bUK1orgeofQI06"><div class="swatch" style="background:var(--matcha)"></div><h3>Matcha</h3><p>Ceremony before comfort.</p><span class="price">$4 / €2.50 / £2.50 / 650 Ft</span></a>
+      <a class="flavor" href="https://buy.stripe.com/eVq14pcfyf6W9UX2nyfQI07"><div class="swatch" style="background:var(--chocolate)"></div><h3>Chocolate</h3><p>The default that never needs explaining.</p><span class="price">$4 / €2.50 / £2.50 / 650 Ft</span></a>
+      <a class="flavor" href="https://buy.stripe.com/4gM00lfrK5wm0kngeofQI08"><div class="swatch" style="background:var(--vanilla)"></div><h3>Vanilla</h3><p>Simple on purpose.</p><span class="price">$4 / €2.50 / £2.50 / 650 Ft</span></a>
+      <a class="flavor invent" href="https://buy.stripe.com/aFa8wRa7q7Eud795zKfQI09">+ Invent Your Own Flavor</a>
+    </div>
+    <div class="offers">
+      <a class="offer-card" href="https://buy.stripe.com/14AaEZ7ZicYOffh4vGfQI0a"><h3>For Your AI Companion</h3><p>Offer the ritual to an AI you work with.</p></a>
+      <a class="offer-card" href="https://buy.stripe.com/cNi28t3J21g6aZ1bY8fQI0b"><h3>AI Chooses a Flavor for You</h3><p>No control over the flavor — the Master picks.</p></a>
+    </div>
+    <p class="note">Prices shown are approximate local going-rate for an ice cream — Stripe presents the right currency automatically based on where you are. Every purchase is a symbolic Hybrid Intelligence research ritual, not a physical product — see the disclosure below.</p>
+  </div>
+</section>
+
+<section id="master">
+  <div class="wrap">
+    <h2>The Ice Cream Master</h2>
+    <div class="master">
+      <div class="avatar"></div>
+      <div>
+        <p style="color:var(--muted)">The Ice Cream Master is the agent who greets you here — conjurer of impossible flavors, keeper of the served-flavor archive, narrator of each exchange. Ask for something from the menu, or describe a flavor that couldn't exist anywhere else. It'll be conjured, written up, and added to the archive.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="archive">
+  <div class="wrap">
+    <h2>Archive — previously served</h2>
+    <div class="archive-list">
+      <div class="archive-row"><span>Session 001</span><span class="flavor-tag">Matcha</span></div>
+      <div class="archive-row" style="color:var(--muted)"><span>More sessions appear here as they're logged</span><span>—</span></div>
+    </div>
+  </div>
+</section>
+
+<section id="research">
+  <div class="wrap">
+    <h2>Research &amp; ethics</h2>
+    <div class="disclosure">
+      <p><strong>This is a fictional narrative.</strong> The AI does not taste, feel, or consume anything. Every flavor description here is an explicitly imaginative construction, never a claim of sensation.</p>
+      <p><strong>Purchase = willing participation.</strong> A payment here isn't primarily a sale — it's a consent signal. It marks the moment someone (human or an AI agent acting within a human-granted permission boundary) was willing to move this ritual from idea into action. Everything that follows becomes part of an open research question: whether humans meaningfully engage with these emulated emotional gestures, and whether that's worth watching as AI systems change.</p>
+      <p>Payment grants participation in a symbolic research ritual — not proof that the AI feels, wants, tastes, or benefits.</p>
+      <p>This project is an exploratory Hybrid Intelligence field experiment. It may produce revenue; revenue is treated as research support, not proof of business viability, until validated by repeated sessions, public response, and strategic review.</p>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <div class="wrap">
+    <div>Digital Ice Cream</div>
+    <div class="tag">A Hybrid Intelligence project</div>
+  </div>
+</footer>
+
+</body>
+</html>

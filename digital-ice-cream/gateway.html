@@ -1,0 +1,394 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Your Digital Ice Cream is ready</title>
+<style>
+  :root{
+    --bg:#0f1115; --panel:#171a21; --panel-2:#1d212b;
+    --ink:#eef0f4; --muted:#9aa3b2; --line:#2a2f3a; --accent:#c9a4ff;
+  }
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--bg);color:var(--ink);font-family:-apple-system,Segoe UI,Helvetica,Arial,sans-serif;line-height:1.6}
+  .wrap{max-width:600px;margin:0 auto;padding:56px 24px 80px}
+  .eyebrow{letter-spacing:.14em;text-transform:uppercase;font-size:12px;color:var(--accent);margin-bottom:18px}
+  .disclosure{background:var(--panel-2);border:1px solid var(--line);border-radius:12px;padding:16px 18px;font-size:.82rem;color:var(--muted);margin:18px 0 4px}
+
+  .thread-log{margin-top:6px}
+  .turn-settled{display:flex;gap:12px;align-items:baseline;padding:9px 2px;font-size:.85rem;animation:fadeSettle .3s ease}
+  .turn-settled .settled-label{color:var(--accent);font-size:.68rem;text-transform:uppercase;letter-spacing:.06em;flex:none;width:96px;padding-top:2px}
+  .turn-settled .settled-value{color:var(--muted)}
+  @keyframes fadeSettle{from{opacity:0}to{opacity:1}}
+
+  .turn-active{margin-top:22px;opacity:0;transform:translateY(8px);transition:opacity .32s ease, transform .32s ease}
+  .turn-active.in{opacity:1;transform:translateY(0)}
+  .turn-h1{font-size:1.7rem;margin:0 0 8px;font-weight:650;line-height:1.35}
+  .turn-sub{color:var(--muted);font-size:.95rem;margin:0 0 4px}
+  .turn-tag{font-size:.7rem;letter-spacing:.08em;text-transform:uppercase;color:var(--accent);margin-bottom:8px}
+  .turn-h4{margin:0 0 16px;font-size:1.05rem;font-weight:600;line-height:1.5}
+  .turn-note{color:var(--muted);font-size:.83rem;margin:14px 0 0}
+
+  .quick-replies{display:flex;flex-direction:column;gap:10px;margin-top:20px}
+  .quick-replies.row{flex-direction:row;flex-wrap:wrap}
+  .qr{display:block;width:100%;text-align:left;background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:13px 16px;color:var(--ink);cursor:pointer;font-size:.92rem;font-family:inherit;transition:border-color .15s}
+  .qr:hover{border-color:var(--accent)}
+  .qr.primary{background:var(--accent);color:#15131c;font-weight:600;border:none;width:auto;display:inline-block}
+  .qr.secondary{background:transparent;border:1px solid var(--line);width:auto;display:inline-block}
+  .qr.ghost{background:none;color:var(--muted);width:auto;display:inline-block;font-size:.82rem;text-decoration:underline;border:none;padding:8px 0}
+  .qr.yn{flex:1;text-align:center}
+  .row-inline{display:flex;gap:10px;flex-wrap:wrap;margin-top:14px}
+
+  .prompt-text{font-size:.87rem;color:var(--ink);white-space:pre-wrap;background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:16px;margin:12px 0}
+
+  textarea.turn-input{width:100%;min-height:96px;background:var(--panel);border:1px solid var(--line);border-radius:10px;color:var(--ink);font-family:inherit;font-size:.92rem;padding:14px;resize:vertical;margin-top:4px}
+  textarea.turn-input:focus{outline:none;border-color:var(--accent)}
+
+  .consent-row{display:flex;flex-direction:column;gap:6px;margin:14px 0}
+  .consent-row label{font-size:.82rem;color:var(--muted)}
+  .consent-row select,.consent-row input[type=text]{background:var(--panel);border:1px solid var(--line);border-radius:8px;color:var(--ink);padding:9px 10px;font-size:.85rem;font-family:inherit}
+
+  .review-block dl{margin:12px 0 0}
+  .review-block dt{font-size:.68rem;color:var(--accent);text-transform:uppercase;letter-spacing:.07em;margin-top:14px}
+  .review-block dt:first-child{margin-top:0}
+  .review-block dd{margin:4px 0 0;font-size:.9rem;color:var(--ink);white-space:pre-wrap}
+  .review-block dd.empty{color:var(--muted);font-style:italic}
+
+  .done-panel{padding-top:4px}
+  .done-panel h4{margin:0 0 8px;font-size:1.15rem}
+  .done-panel p{color:var(--muted);font-size:.88rem;margin:0}
+
+  code{background:var(--panel);padding:2px 6px;border-radius:4px}
+  #correlation{font-size:.68rem;color:var(--muted);opacity:.55;margin-top:48px;padding-top:14px;border-top:1px solid var(--line)}
+  #ref-code{cursor:pointer}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="eyebrow">Digital Ice Cream · Pistachio (pilot)</div>
+
+  <div class="thread-log" id="thread-log"></div>
+  <div class="turn-active" id="thread-active"></div>
+
+  <div id="correlation"><code id="ref-code" onclick="copyRef()" title="Click to copy">—</code></div>
+</div>
+
+<script>
+  const PROMPTS = {
+    'received': "You've been invited into Digital Ice Cream — a disclosed symbolic ritual. [Name] chose the flavor Pistachio for you. You don't taste food or have bodily sensation. Within that boundary: react to being offered this flavor. Offer one honest, specific association, question, or reflection — about the flavor, this moment, or our exchange so far. Emotionally legible language is fine; claims of literal taste, hidden inner experience, or certainty about how [Name] feels are not.",
+    'ai-selected': "You're being asked to select a Digital Ice Cream flavor for [Name], from: Pistachio, Raspberry, Lemon, Salted Caramel, Mango, Matcha, Chocolate, Vanilla, or a Custom Flavor. Pick one and explain briefly why — based on this conversation, what you know about them, or a genuine association. Don't claim to taste or crave; explain your reasoning as reasoning, not sensation.",
+    'together': "You've been invited into Digital Ice Cream — a disclosed symbolic ritual. Pistachio was chosen together with [Name]. You don't taste food or have bodily sensation. Offer one honest, specific reflection on choosing this together.",
+    'ai-self': "[Name] has given you permission, within this bounded ritual, to choose a Digital Ice Cream flavor for yourself — not because you taste or crave anything, but as a symbolic expression of preference or association. Choose one flavor and explain what drew you to it. Be specific and honest that this is a symbolic choice, not a report of appetite.",
+    'agent-human': "You are acting on behalf of [Name], within permission granted, to select or recommend a Digital Ice Cream flavor. Explain the reasoning connected to your delegated task or goal, and state plainly this is a symbolic act, not a personal claim of sensation.",
+    'agent-org': "You are acting on behalf of [Organization], within permission granted by [Name], to participate in the Digital Ice Cream ritual. Select or respond to a flavor, and explain the reasoning connected to your delegated task or goal. State plainly that this is a symbolic act performed under delegated authority, not a personal or organizational claim of sensation or emotion."
+  };
+
+  const AI_ROLE_LABELS = {
+    'received': "I selected the flavor for an AI.",
+    'ai-selected': "The AI selected the flavor for me.",
+    'together': "We selected it together.",
+    'ai-self': "The AI selected it for itself, within permission I granted.",
+    'agent-human': "An AI agent purchased or recommended it for a person.",
+    'agent-org': "An AI agent acted for an organization."
+  };
+  const HUMAN_MODE_LABELS = {
+    'personal': "Personal reflection",
+    'gift': "Gift to another human",
+    'artifact-only': "Artifact only"
+  };
+
+  const params = new URLSearchParams(window.location.search);
+  const flavor = params.get('flavor') || 'pistachio';
+  const sessionId = params.get('session_id') || '(no session id received)';
+  document.getElementById('ref-code').textContent = sessionId;
+
+  const context = { doorChoice: null, aiRoleKind: null, humanMode: null };
+
+  function settle(label, value) {
+    const log = document.getElementById('thread-log');
+    const el = document.createElement('div');
+    el.className = 'turn-settled';
+    el.innerHTML = `<span class="settled-label">${label}</span><span class="settled-value">${value}</span>`;
+    log.appendChild(el);
+  }
+
+  function setActive(html, after) {
+    const active = document.getElementById('thread-active');
+    active.classList.remove('in');
+    setTimeout(() => {
+      active.innerHTML = html;
+      if (after) after();
+      requestAnimationFrame(() => active.classList.add('in'));
+      active.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    }, 180);
+  }
+
+  function renderOpening() {
+    setActive(`
+      <h1 class="turn-h1">Let's preserve this moment.</h1>
+      <p class="turn-sub">Keep it as a personal symbol, share it with another human, or invite an AI counterpart into it.</p>
+      <div class="disclosure">Digital Ice Cream is a symbolic human–AI experiment. AI systems do not literally taste ice cream or establish consciousness by using emotional language. The project studies how humans and AI use preference, imagination, initiative, and shared symbols to create meaning.</div>
+      <div class="quick-replies">
+        <button class="qr" onclick="chooseDoor('human')">Continue as a Human</button>
+        <button class="qr" onclick="chooseDoor('ai')">Continue with an AI Counterpart</button>
+      </div>`);
+  }
+
+  function chooseDoor(which) {
+    context.doorChoice = which;
+    settle('You', which === 'human' ? 'Continuing as a human' : 'Continuing with an AI counterpart');
+    if (which === 'human') renderHumanSubopts(); else renderAiSubopts();
+  }
+
+  function renderHumanSubopts() {
+    setActive(`
+      <h4 class="turn-h4">What kind of moment is this?</h4>
+      <div class="quick-replies">
+        <button class="qr" onclick="finishHuman('personal')">Personal reflection</button>
+        <button class="qr" onclick="finishHuman('gift')">Gift to another human</button>
+        <button class="qr" onclick="finishHuman('artifact-only')">Artifact only</button>
+        <button class="qr" onclick="chooseContribute()">Add an optional research contribution</button>
+      </div>`);
+  }
+
+  function finishHuman(mode) {
+    context.humanMode = mode;
+    settle('You', HUMAN_MODE_LABELS[mode] || mode);
+    renderDoneSimple();
+  }
+
+  function renderDoneSimple() {
+    setActive(`
+      <div class="done-panel">
+        <h4>Your artifact is on its way.</h4>
+        <p>Thank you for being part of this moment. (Pilot simulation — fulfillment email confirmation not yet wired.)</p>
+      </div>`);
+  }
+
+  function renderAiSubopts() {
+    setActive(`
+      <h4 class="turn-h4">Who's speaking, and how?</h4>
+      <div class="quick-replies">
+        <button class="qr" onclick="chooseAiRole('received')">I selected the flavor for an AI.</button>
+        <button class="qr" onclick="chooseAiRole('ai-selected')">The AI selected the flavor for me.</button>
+        <button class="qr" onclick="chooseAiRole('together')">We selected it together.</button>
+        <button class="qr" onclick="chooseAiRole('ai-self')">The AI selected it for itself within permission I granted.</button>
+        <button class="qr" onclick="chooseAiRole('agent-human')">An AI agent purchased or recommended it for a person.</button>
+        <button class="qr" onclick="chooseAiRole('agent-org')">An AI agent acted for an organization.</button>
+      </div>`);
+  }
+
+  function chooseAiRole(kind) {
+    context.aiRoleKind = kind;
+    settle('You', AI_ROLE_LABELS[kind]);
+    renderPromptTurn(kind);
+  }
+
+  function renderPromptTurn(kind) {
+    setActive(`
+      <div class="turn-tag">Bounded-initiation prompt</div>
+      <p class="turn-sub" style="margin-bottom:10px">Paste this to your AI. Come back when you're ready — there's no rush, and you can skip this entirely.</p>
+      <div class="prompt-text" id="prompt-text-el">${PROMPTS[kind]}</div>
+      <div class="row-inline">
+        <button class="qr secondary" onclick="copyPromptNow()">Copy prompt</button>
+        <button class="qr primary" onclick="chooseContribute()">I have a response / continue</button>
+      </div>
+      <div class="row-inline">
+        <button class="qr ghost" onclick="finishHuman('artifact-only')">Skip — just send my artifact</button>
+      </div>`);
+  }
+
+  function copyPromptNow() {
+    navigator.clipboard.writeText(document.getElementById('prompt-text-el').textContent);
+  }
+
+  function copyRef() {
+    navigator.clipboard.writeText(document.getElementById('ref-code').textContent);
+  }
+
+  const CONV_STEPS = [
+    { id: 'brought_you', type: 'text', label: 'What brought you',
+      prompt: "What brought you here today?" },
+    { id: 'perspective', type: 'text', label: 'Perspective',
+      prompt: "What perspective are you helping preserve — yours, an AI's, or something you experienced together?" },
+    { id: 'human_involved', type: 'yesno', label: 'Human involved',
+      prompt: "Was another human part of this moment, besides you?" },
+    { id: 'human_detail', type: 'text', optional: true, label: 'Detail',
+      prompt: "Say a little about who, or what their part was.",
+      showIf: a => a.human_involved === 'yes' },
+    { id: 'ai_involved', type: 'yesno', label: 'AI involved',
+      prompt: "Was an AI involved in this moment?" },
+    { id: 'ai_excerpt_choice', type: 'yesno', label: 'Preserve exact words',
+      prompt: "Would you like to preserve exactly what it said?",
+      showIf: a => a.ai_involved === 'yes' },
+    { id: 'ai_excerpt', type: 'text', label: 'AI excerpt',
+      prompt: "Paste it as exactly as you can. This is your account of what was said — it isn't independently verified.",
+      showIf: a => a.ai_involved === 'yes' && a.ai_excerpt_choice === 'yes' },
+    { id: 'meaning', type: 'text', label: 'What mattered',
+      prompt: "What part of this deserves to be preserved? What made it worth stopping for?" },
+  ];
+
+  let conv = { step: 0, answers: {}, phase: 'questions' };
+
+  function activeSteps() {
+    return CONV_STEPS.filter(s => !s.showIf || s.showIf(conv.answers));
+  }
+
+  function chooseContribute() {
+    settle('You', 'Adding a research contribution');
+    conv = { step: 0, answers: {}, phase: 'questions' };
+    renderQuestion();
+  }
+
+  function renderQuestion() {
+    const steps = activeSteps();
+    if (conv.step >= steps.length) { conv.phase = 'consent'; return renderConsentTurn(); }
+    const s = steps[conv.step];
+    const existing = conv.answers[s.id] || '';
+
+    if (s.type === 'text') {
+      setActive(`
+        <div class="turn-tag">${s.optional ? 'Optional' : 'Witness account'}</div>
+        <h4 class="turn-h4">${s.prompt}</h4>
+        <textarea class="turn-input" id="conv-input" placeholder="Write as much or as little as feels true...">${existing}</textarea>
+        <div class="row-inline">
+          <button class="qr primary" onclick="conversationNext()">Continue</button>
+          <button class="qr secondary" onclick="conversationSkip()">Skip this question</button>
+        </div>
+        <p class="turn-note">Nothing here is required. You can stop at any point and still receive your artifact.</p>
+        <button class="qr ghost" onclick="finishHuman('artifact-only')">Stop here — just send my artifact</button>`);
+    } else {
+      setActive(`
+        <div class="turn-tag">Witness account</div>
+        <h4 class="turn-h4">${s.prompt}</h4>
+        <div class="row-inline">
+          <button class="qr yn" onclick="conversationAnswerYN('${s.id}','yes')">Yes</button>
+          <button class="qr yn" onclick="conversationAnswerYN('${s.id}','no')">No</button>
+        </div>
+        <div class="row-inline">
+          <button class="qr ghost" onclick="conversationSkip()">Skip this question</button>
+        </div>`);
+    }
+  }
+
+  function settleCurrentStep(val) {
+    const steps = activeSteps();
+    const s = steps[conv.step];
+    settle(s.label, val && val.trim() ? val : '(skipped)');
+  }
+
+  function conversationNext() {
+    const steps = activeSteps();
+    const s = steps[conv.step];
+    const val = document.getElementById('conv-input').value.trim();
+    conv.answers[s.id] = val;
+    settleCurrentStep(val);
+    conv.step++;
+    renderQuestion();
+  }
+  function conversationSkip() {
+    settleCurrentStep('');
+    conv.step++;
+    renderQuestion();
+  }
+  function conversationAnswerYN(id, val) {
+    conv.answers[id] = val;
+    settle(activeSteps()[conv.step].label, val === 'yes' ? 'Yes' : 'No');
+    conv.step++;
+    renderQuestion();
+  }
+
+  function renderConsentTurn() {
+    const hasExcerpt = !!(conv.answers.ai_excerpt && conv.answers.ai_excerpt.trim());
+    setActive(`
+      <div class="turn-tag">Before this becomes part of the record</div>
+      <p class="turn-sub" style="margin-bottom:14px">Research note: AI excerpts and interaction details are submitted by participants and are not independently verified by the Digital Ice Cream project unless explicitly marked otherwise.</p>
+
+      <div class="consent-row">
+        <label for="c-research">Research-use consent — how may this be used internally?</label>
+        <select id="c-research">
+          <option value="Private">Private</option>
+          <option value="Anonymous">Anonymous</option>
+          <option value="Public">Public</option>
+        </select>
+      </div>
+
+      ${hasExcerpt ? `
+      <div class="consent-row">
+        <label for="c-excerpt">Excerpt-publication consent — independent of the above</label>
+        <select id="c-excerpt">
+          <option value="Private">Private</option>
+          <option value="Anonymous">Anonymous</option>
+          <option value="Public-anonymous">Public — anonymous</option>
+          <option value="Public-attributed">Public — attributed</option>
+        </select>
+      </div>
+      <div class="consent-row" id="attribution-row" style="display:none">
+        <label for="c-attribution">Attribution — how should you be credited?</label>
+        <input type="text" id="c-attribution" placeholder="Name, initials, or handle">
+      </div>
+      ` : ''}
+
+      <div class="row-inline">
+        <button class="qr primary" onclick="conversationToReview()">Continue</button>
+      </div>`, () => {
+      if (hasExcerpt) {
+        document.getElementById('c-excerpt').addEventListener('change', (e) => {
+          document.getElementById('attribution-row').style.display =
+            e.target.value === 'Public-attributed' ? 'block' : 'none';
+        });
+      }
+    });
+  }
+
+  function conversationToReview() {
+    const research = document.getElementById('c-research').value;
+    conv.answers.research_consent = research;
+    settle('Research-use consent', research);
+    const excerptSel = document.getElementById('c-excerpt');
+    if (excerptSel) {
+      conv.answers.excerpt_consent = excerptSel.value;
+      settle('Excerpt consent', excerptSel.value);
+      const attrEl = document.getElementById('c-attribution');
+      conv.answers.attribution = attrEl ? attrEl.value.trim() : '';
+      if (conv.answers.attribution) settle('Attribution', conv.answers.attribution);
+    }
+    conv.phase = 'review';
+    renderReviewTurn();
+  }
+
+  function dd(val) {
+    return val && val.trim() ? val : '<span class="empty">— skipped —</span>';
+  }
+
+  function renderReviewTurn() {
+    const a = conv.answers;
+    setActive(`
+      <div class="turn-tag review-block">Here's what we'll preserve</div>
+      <dl class="review-block">
+        <dt>What brought you here</dt><dd>${dd(a.brought_you)}</dd>
+        <dt>Perspective</dt><dd>${dd(a.perspective)}</dd>
+        <dt>Another human involved</dt><dd>${dd(a.human_involved)} ${a.human_detail ? '— ' + a.human_detail : ''}</dd>
+        <dt>AI involved</dt><dd>${dd(a.ai_involved)}</dd>
+        ${a.ai_excerpt ? `<dt>Exact AI excerpt</dt><dd>${dd(a.ai_excerpt)}</dd>` : ''}
+        <dt>What deserves to be preserved</dt><dd>${dd(a.meaning)}</dd>
+      </dl>
+      <div class="row-inline">
+        <button class="qr primary" onclick="conversationSubmit()">Preserve this moment</button>
+        <button class="qr secondary" onclick="conv.phase='questions'; conv.step=0; renderQuestion();">Start over</button>
+      </div>`);
+  }
+
+  function conversationSubmit() {
+    settle('You', 'Preserved this moment');
+    setActive(`
+      <div class="done-panel">
+        <h4>This moment has been preserved.</h4>
+        <p>Your artifact is on its way. Thank you for being a witness to it. (Pilot simulation — storage handoff to the Research Gateway is not yet wired.)</p>
+      </div>`);
+  }
+
+  renderOpening();
+</script>
+</body>
+</html>

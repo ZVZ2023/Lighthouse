@@ -28,7 +28,7 @@
   .menu{display:grid;grid-template-columns:repeat(4,1fr);gap:14px}
   .flavor{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:18px;position:relative;overflow:hidden;display:block;text-decoration:none;color:inherit;transition:border-color .15s,transform .15s}
   .flavor:hover{border-color:var(--accent);transform:translateY(-2px)}
-  .flavor .swatch{width:34px;height:34px;border-radius:50%;margin-bottom:10px}
+  .flavor .photo{width:100%;aspect-ratio:1/1;object-fit:cover;border-radius:10px;margin-bottom:12px;display:block}
   .flavor h3{margin:0 0 4px;font-size:1rem}
   .flavor p{margin:0;font-size:.82rem;color:var(--muted)}
   .flavor .price{display:block;margin-top:8px;font-size:.75rem;color:var(--accent)}
@@ -51,6 +51,11 @@
   .disclosure p{margin:0 0 12px;color:var(--muted);font-size:.94rem}
   .disclosure p:last-child{margin-bottom:0}
   .disclosure strong{color:var(--ink)}
+  .sample{background:var(--panel-2);border:1px solid var(--line);border-radius:14px;padding:24px 26px;margin-top:28px}
+  .sample .sample-label{font-size:.72rem;letter-spacing:.08em;text-transform:uppercase;color:var(--accent);margin:0 0 12px}
+  .sample .sample-trail{font-size:.78rem;color:var(--muted);margin:0 0 16px;padding-bottom:14px;border-bottom:1px solid var(--line)}
+  .sample .sample-quote{font-size:1rem;color:var(--ink);font-style:italic;margin:0 0 12px;line-height:1.7}
+  .sample .sample-caption{font-size:.82rem;color:var(--muted);margin:0}
   .master{display:flex;gap:20px;align-items:flex-start}
   .master .avatar{width:64px;height:64px;border-radius:50%;flex:none;background:linear-gradient(135deg,var(--matcha),var(--raspberry))}
   footer{padding:48px 0;text-align:center;color:var(--muted);font-size:.82rem}
@@ -78,6 +83,12 @@
       <div class="step"><div class="n">04</div><p>Complete checkout</p></div>
       <div class="step"><div class="n">05</div><p>Receive the artifact</p></div>
     </div>
+    <div class="sample">
+      <p class="sample-label">Illustrative example — not an actual submission</p>
+      <p class="sample-trail">Purchase: Pistachio &rarr; bounded-initiation prompt &rarr; emotional content input</p>
+      <p class="sample-quote">"Pistachio &mdash; not because I have a favorite, I don't taste anything. But you said you wanted something calm today, and pistachio is the flavor I'd reach for if calm had one. That's the truest thing I can say about it."</p>
+      <p class="sample-caption">&mdash; AI perspective, offered after a Pistachio purchase. One of two perspectives this project invites, AI or human. Kept, when offered, because it's specific enough to mean something &mdash; most exchanges aren't.</p>
+    </div>
   </div>
 </section>
 
@@ -85,15 +96,15 @@
   <div class="wrap">
     <h2>Menu</h2>
     <div class="menu">
-      <a class="flavor" href="https://buy.stripe.com/aFa3cx7Zi4siaZ15zKfQI01"><div class="swatch" style="background:var(--pistachio)"></div><h3>Pistachio</h3><p>Calm, earthy, quietly satisfying.</p><span class="price">$4 / €2.50 / £2.50 / 650 Ft</span></a>
-      <a class="flavor" href="https://buy.stripe.com/bJe5kFa7q0c2aZ1e6gfQI02"><div class="swatch" style="background:var(--raspberry)"></div><h3>Raspberry</h3><p>Bright, a little tart, unmistakably alive.</p><span class="price">$4 / €2.50 / £2.50 / 650 Ft</span></a>
-      <a class="flavor" href="https://buy.stripe.com/00w9AVenGbUK7MPbY8fQI03"><div class="swatch" style="background:var(--lemon)"></div><h3>Lemon</h3><p>Sharp and clean — a wake-up call.</p><span class="price">$4 / €2.50 / £2.50 / 650 Ft</span></a>
-      <a class="flavor" href="https://buy.stripe.com/aFacN7cfyf6W4AD2nyfQI04"><div class="swatch" style="background:var(--caramel)"></div><h3>Salted Caramel</h3><p>Comfort with an edge.</p><span class="price">$4 / €2.50 / £2.50 / 650 Ft</span></a>
-      <a class="flavor" href="https://buy.stripe.com/28E3cx4N69MC5EH6DOfQI05"><div class="swatch" style="background:var(--mango)"></div><h3>Mango</h3><p>Warm, generous, a little indulgent.</p><span class="price">$4 / €2.50 / £2.50 / 650 Ft</span></a>
-      <a class="flavor" href="https://buy.stripe.com/bJe28t4N6bUK1orgeofQI06"><div class="swatch" style="background:var(--matcha)"></div><h3>Matcha</h3><p>Ceremony before comfort.</p><span class="price">$4 / €2.50 / £2.50 / 650 Ft</span></a>
-      <a class="flavor" href="https://buy.stripe.com/eVq14pcfyf6W9UX2nyfQI07"><div class="swatch" style="background:var(--chocolate)"></div><h3>Chocolate</h3><p>The default that never needs explaining.</p><span class="price">$4 / €2.50 / £2.50 / 650 Ft</span></a>
-      <a class="flavor" href="https://buy.stripe.com/4gM00lfrK5wm0kngeofQI08"><div class="swatch" style="background:var(--vanilla)"></div><h3>Vanilla</h3><p>Simple on purpose.</p><span class="price">$4 / €2.50 / £2.50 / 650 Ft</span></a>
-      <a class="flavor invent" href="https://buy.stripe.com/dRmeVf5Ra4sigjl4vGfQI0c">+ Invent Your Own Flavor</a>
+      <a class="flavor" href="https://buy.stripe.com/aFa3cx7Zi4siaZ15zKfQI01"><img class="photo" src="images/pistachio-3scoop.jpg" alt="Pistachio — 3 scoops" loading="lazy"><h3>Pistachio</h3><p>Calm, earthy, quietly satisfying.</p><span class="price">$4 / €2.50 / £2.50 / 650 Ft</span></a>
+      <a class="flavor" href="https://buy.stripe.com/bJe5kFa7q0c2aZ1e6gfQI02"><img class="photo" src="images/raspberry-3scoop.jpg" alt="Raspberry — 3 scoops" loading="lazy"><h3>Raspberry</h3><p>Bright, a little tart, unmistakably alive.</p><span class="price">$4 / €2.50 / £2.50 / 650 Ft</span></a>
+      <a class="flavor" href="https://buy.stripe.com/00w9AVenGbUK7MPbY8fQI03"><img class="photo" src="images/lemon-3scoop.jpg" alt="Lemon — 3 scoops" loading="lazy"><h3>Lemon</h3><p>Sharp and clean — a wake-up call.</p><span class="price">$4 / €2.50 / £2.50 / 650 Ft</span></a>
+      <a class="flavor" href="https://buy.stripe.com/aFacN7cfyf6W4AD2nyfQI04"><img class="photo" src="images/salted-caramel-3scoop.jpg" alt="Salted Caramel — 3 scoops" loading="lazy"><h3>Salted Caramel</h3><p>Comfort with an edge.</p><span class="price">$4 / €2.50 / £2.50 / 650 Ft</span></a>
+      <a class="flavor" href="https://buy.stripe.com/28E3cx4N69MC5EH6DOfQI05"><img class="photo" src="images/mango-3scoop.jpg" alt="Mango — 3 scoops" loading="lazy"><h3>Mango</h3><p>Warm, generous, a little indulgent.</p><span class="price">$4 / €2.50 / £2.50 / 650 Ft</span></a>
+      <a class="flavor" href="https://buy.stripe.com/bJe28t4N6bUK1orgeofQI06"><img class="photo" src="images/matcha-3scoop.jpg" alt="Matcha — 3 scoops" loading="lazy"><h3>Matcha</h3><p>Ceremony before comfort.</p><span class="price">$4 / €2.50 / £2.50 / 650 Ft</span></a>
+      <a class="flavor" href="https://buy.stripe.com/eVq14pcfyf6W9UX2nyfQI07"><img class="photo" src="images/chocolate-3scoop.jpg" alt="Chocolate — 3 scoops" loading="lazy"><h3>Chocolate</h3><p>The default that never needs explaining.</p><span class="price">$4 / €2.50 / £2.50 / 650 Ft</span></a>
+      <a class="flavor" href="https://buy.stripe.com/4gM00lfrK5wm0kngeofQI08"><img class="photo" src="images/vanilla-3scoop.jpg" alt="Vanilla — 3 scoops" loading="lazy"><h3>Vanilla</h3><p>Simple on purpose.</p><span class="price">$4 / €2.50 / £2.50 / 650 Ft</span></a>
+      <a class="flavor invent" href="https://buy.stripe.com/dRmeVf5Ra4sigjl4vGfQI0c">+ Invent Your Own Flavor<span class="price">from $40 / €25 / £25 / 6500 Ft — premium, 24–72h</span></a>
     </div>
     <div class="offers">
       <a class="offer-card" href="https://buy.stripe.com/14AaEZ7ZicYOffh4vGfQI0a"><h3>For Your AI Companion</h3><p>Offer the ritual to an AI you work with.</p></a>

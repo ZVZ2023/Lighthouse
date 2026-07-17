@@ -206,6 +206,27 @@
     navigator.clipboard.writeText(document.getElementById('ref-code').textContent);
   }
 
+  /* ---------------- Substantiate: two equally valid paths ---------------- */
+  /* Purchase -> Contribution -> Research. The conversation is one way to
+     contribute, not the way. Both paths converge into the same archive. */
+
+  function chooseContribute() {
+    settle('You', 'Ready to contribute');
+    renderContributionChoice();
+  }
+
+  function renderContributionChoice() {
+    setActive(`
+      <h4 class="turn-h4">How would you like to contribute?</h4>
+      <div class="quick-replies">
+        <button class="qr" onclick="startGuidedPath()">Have a conversation about it</button>
+        <button class="qr" onclick="startDirectPath()">I already have something to share</button>
+      </div>
+      <p class="turn-note">Either way, it becomes part of the same research archive.</p>`);
+  }
+
+  /* ---- Path 1: Guided conversation ---- */
+
   const CONV_STEPS = [
     { id: 'brought_you', type: 'text', label: 'What brought you',
       prompt: "What brought you here today?" },
@@ -234,8 +255,8 @@
     return CONV_STEPS.filter(s => !s.showIf || s.showIf(conv.answers));
   }
 
-  function chooseContribute() {
-    settle('You', 'Adding a research contribution');
+  function startGuidedPath() {
+    settle('You', 'Having a conversation about it');
     conv = { step: 0, answers: {}, phase: 'questions' };
     renderQuestion();
   }
@@ -302,7 +323,7 @@
     const hasExcerpt = !!(conv.answers.ai_excerpt && conv.answers.ai_excerpt.trim());
     setActive(`
       <div class="turn-tag">Before this becomes part of the record</div>
-      <p class="turn-sub" style="margin-bottom:14px">Research note: AI excerpts and interaction details are submitted by participants and are not independently verified by the Digital Ice Cream project unless explicitly marked otherwise.</p>
+      <p class="turn-sub" style="margin-bottom:14px">Research note: contributions are submitted by participants and are not independently verified by the Digital Ice Cream project unless explicitly marked otherwise.</p>
 
       <div class="consent-row">
         <label for="c-research">Research-use consent — how may this be used internally?</label>
@@ -366,6 +387,7 @@
     setActive(`
       <div class="turn-tag review-block">Here's what we'll preserve</div>
       <dl class="review-block">
+        <dt>Contribution type</dt><dd>Guided conversation</dd>
         <dt>What brought you here</dt><dd>${dd(a.brought_you)}</dd>
         <dt>Perspective</dt><dd>${dd(a.perspective)}</dd>
         <dt>Another human involved</dt><dd>${dd(a.human_involved)} ${a.human_detail ? '— ' + a.human_detail : ''}</dd>
@@ -384,7 +406,128 @@
     setActive(`
       <div class="done-panel">
         <h4>This moment has been preserved.</h4>
-        <p>Your artifact is on its way. Thank you for being a witness to it. (Pilot simulation — storage handoff to the Research Gateway is not yet wired.)</p>
+        <p>Your artifact is on its way. Thank you for being a witness to it. (Pilot simulation — storage handoff to the research archive is not yet wired.)</p>
+      </div>`);
+  }
+
+  /* ---- Path 2: Direct contribution (already-prepared artifacts) ---- */
+
+  const DIRECT_STEPS = [
+    { id: 'topic', label: 'Topic or emotion',
+      prompt: "In a few words, what's this about?" },
+    { id: 'content', label: 'Contribution',
+      prompt: "Share it — paste a link, or describe what it is and how to access it." },
+    { id: 'identity', optional: true, label: 'Credited as',
+      prompt: "How should this be credited? Leave blank to stay anonymous." },
+  ];
+
+  let direct = { step: 0, answers: {} };
+
+  function startDirectPath() {
+    settle('You', 'Contributing something I already have');
+    direct = { step: 0, answers: {} };
+    renderContributionType();
+  }
+
+  function renderContributionType() {
+    setActive(`
+      <div class="turn-tag">Contribution type</div>
+      <h4 class="turn-h4">What are you sharing?</h4>
+      <div class="quick-replies">
+        <button class="qr" onclick="chooseContribType('PDF / Document')">PDF / Document</button>
+        <button class="qr" onclick="chooseContribType('URL / Link')">URL / Link</button>
+        <button class="qr" onclick="chooseContribType('GitHub repository')">GitHub repository</button>
+        <button class="qr" onclick="chooseContribType('Protocol')">Protocol</button>
+        <button class="qr" onclick="chooseContribType('Audio')">Audio</button>
+        <button class="qr" onclick="chooseContribType('Video')">Video</button>
+        <button class="qr" onclick="chooseContribType('Image')">Image</button>
+        <button class="qr" onclick="chooseContribType('Other')">Other</button>
+      </div>`);
+  }
+
+  function chooseContribType(t) {
+    direct.answers.type = t;
+    settle('Type', t);
+    direct.step = 0;
+    renderDirectQuestion();
+  }
+
+  function renderDirectQuestion() {
+    if (direct.step >= DIRECT_STEPS.length) return renderDirectConsent();
+    const s = DIRECT_STEPS[direct.step];
+    const existing = direct.answers[s.id] || '';
+    setActive(`
+      <div class="turn-tag">${s.optional ? 'Optional' : 'Contribution'}</div>
+      <h4 class="turn-h4">${s.prompt}</h4>
+      <textarea class="turn-input" id="direct-input" placeholder="Write as much or as little as feels true...">${existing}</textarea>
+      <div class="row-inline">
+        <button class="qr primary" onclick="directNext()">Continue</button>
+        <button class="qr secondary" onclick="directSkip()">Skip</button>
+      </div>
+      <button class="qr ghost" onclick="finishHuman('artifact-only')">Stop here — just send my artifact</button>`);
+  }
+
+  function directNext() {
+    const s = DIRECT_STEPS[direct.step];
+    const val = document.getElementById('direct-input').value.trim();
+    direct.answers[s.id] = val;
+    settle(s.label, val || '(skipped)');
+    direct.step++;
+    renderDirectQuestion();
+  }
+  function directSkip() {
+    const s = DIRECT_STEPS[direct.step];
+    settle(s.label, '(skipped)');
+    direct.step++;
+    renderDirectQuestion();
+  }
+
+  function renderDirectConsent() {
+    setActive(`
+      <div class="turn-tag">Before this becomes part of the record</div>
+      <p class="turn-sub" style="margin-bottom:14px">Research note: contributions are submitted by participants and are not independently verified by the Digital Ice Cream project unless explicitly marked otherwise.</p>
+      <div class="consent-row">
+        <label for="d-research">Research-use consent — how may this be used?</label>
+        <select id="d-research">
+          <option value="Private">Private</option>
+          <option value="Anonymous">Anonymous</option>
+          <option value="Public">Public</option>
+        </select>
+      </div>
+      <div class="row-inline">
+        <button class="qr primary" onclick="directToReview()">Continue</button>
+      </div>`);
+  }
+
+  function directToReview() {
+    direct.answers.consent = document.getElementById('d-research').value;
+    settle('Research-use consent', direct.answers.consent);
+    renderDirectReview();
+  }
+
+  function renderDirectReview() {
+    const a = direct.answers;
+    setActive(`
+      <div class="turn-tag review-block">Here's what we'll preserve</div>
+      <dl class="review-block">
+        <dt>Contribution type</dt><dd>${dd(a.type)}</dd>
+        <dt>Topic or emotion</dt><dd>${dd(a.topic)}</dd>
+        <dt>Contribution</dt><dd>${dd(a.content)}</dd>
+        <dt>Credited as</dt><dd>${a.identity && a.identity.trim() ? a.identity : 'Anonymous'}</dd>
+        <dt>Research-use consent</dt><dd>${dd(a.consent)}</dd>
+      </dl>
+      <div class="row-inline">
+        <button class="qr primary" onclick="directSubmit()">Preserve this contribution</button>
+        <button class="qr secondary" onclick="direct.step=0; renderContributionType();">Start over</button>
+      </div>`);
+  }
+
+  function directSubmit() {
+    settle('You', 'Preserved this contribution');
+    setActive(`
+      <div class="done-panel">
+        <h4>This contribution has been preserved.</h4>
+        <p>Thank you for adding to the archive. (Pilot simulation — storage handoff to the research archive is not yet wired. Links and descriptions submitted here are not yet actually stored anywhere.)</p>
       </div>`);
   }
 

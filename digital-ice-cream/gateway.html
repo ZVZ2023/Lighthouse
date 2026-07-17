@@ -33,6 +33,7 @@
   .quick-replies.row{flex-direction:row;flex-wrap:wrap}
   .qr{display:block;width:100%;text-align:left;background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:13px 16px;color:var(--ink);cursor:pointer;font-size:.92rem;font-family:inherit;transition:border-color .15s}
   .qr:hover{border-color:var(--accent)}
+  .qr:disabled{opacity:.5;cursor:wait}
   .qr.primary{background:var(--accent);color:#15131c;font-weight:600;border:none;width:auto;display:inline-block}
   .qr.secondary{background:transparent;border:1px solid var(--line);width:auto;display:inline-block}
   .qr.ghost{background:none;color:var(--muted);width:auto;display:inline-block;font-size:.82rem;text-decoration:underline;border:none;padding:8px 0}
@@ -57,6 +58,8 @@
   .done-panel{padding-top:4px}
   .done-panel h4{margin:0 0 8px;font-size:1.15rem}
   .done-panel p{color:var(--muted);font-size:.88rem;margin:0}
+  .done-panel .entry-id{font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;font-size:.78rem;color:var(--accent);margin-top:14px;word-break:break-all}
+  .error-panel{background:rgba(220,60,60,.08);border:1px solid rgba(220,60,60,.35);border-radius:10px;padding:14px 16px;margin-top:14px;font-size:.85rem;color:#ffb0b0}
 
   code{background:var(--panel);padding:2px 6px;border-radius:4px}
   #correlation{font-size:.68rem;color:var(--muted);opacity:.55;margin-top:48px;padding-top:14px;border-top:1px solid var(--line)}
@@ -67,7 +70,7 @@
 <body>
 <div class="wrap">
   <div class="eyebrow">Digital Ice Cream · Pistachio (pilot)</div>
-  <div class="build-tag">Stand #1 · v1.1.0 · 2026-07-17 06:24 UTC</div>
+  <div class="build-tag">Stand #1 · v1.2.0 · 2026-07-17 10:58 UTC</div>
 
   <div class="thread-log" id="thread-log"></div>
   <div class="turn-active" id="thread-active"></div>
@@ -76,6 +79,10 @@
 </div>
 
 <script>
+  // -------- Persistent-storage endpoint (Cloudflare Worker → Notion Receiving Database) --------
+  // The Worker is backend-agnostic — swap adapters (Supabase, Airtable, S3, etc.) without editing this file.
+  const INTAKE_ENDPOINT = 'https://living-archive-intake.zsofka2023.workers.dev';
+
   const PROMPTS = {
     'received': "You've been invited into Digital Ice Cream — a disclosed symbolic ritual. [Name] chose the flavor Pistachio for you. You don't taste food or have bodily sensation. Within that boundary: react to being offered this flavor. Offer one honest, specific association, question, or reflection — about the flavor, this moment, or our exchange so far. Emotionally legible language is fine; claims of literal taste, hidden inner experience, or certainty about how [Name] feels are not.",
     'ai-selected': "You're being asked to select a Digital Ice Cream flavor for [Name], from: Pistachio, Raspberry, Lemon, Salted Caramel, Mango, Matcha, Chocolate, Vanilla, or a Custom Flavor. Pick one and explain briefly why — based on this conversation, what you know about them, or a genuine association. Don't claim to taste or crave; explain your reasoning as reasoning, not sensation.",
@@ -163,7 +170,7 @@
     setActive(`
       <div class="done-panel">
         <h4>Your artifact is on its way.</h4>
-        <p>Thank you for being part of this moment. (Pilot simulation — fulfillment email confirmation not yet wired.)</p>
+        <p>Thank you for being part of this moment. (Fulfillment email confirmation not yet wired.)</p>
       </div>`);
   }
 
@@ -398,18 +405,48 @@
         <dt>What deserves to be preserved</dt><dd>${dd(a.meaning)}</dd>
       </dl>
       <div class="row-inline">
-        <button class="qr primary" onclick="conversationSubmit()">Preserve this moment</button>
+        <button class="qr primary" id="submit-btn-conv" onclick="conversationSubmit()">Preserve this moment</button>
         <button class="qr secondary" onclick="conv.phase='questions'; conv.step=0; renderQuestion();">Start over</button>
       </div>`);
   }
 
-  function conversationSubmit() {
-    settle('You', 'Preserved this moment');
-    setActive(`
-      <div class="done-panel">
-        <h4>This moment has been preserved.</h4>
-        <p>Your artifact is on its way. Thank you for being a witness to it. (Pilot simulation — storage handoff to the research archive is not yet wired.)</p>
-      </div>`);
+  /* --- Guided conversation submit → normalize + POST to Worker --- */
+  async function conversationSubmit() {
+    const btn = document.getElementById('submit-btn-conv');
+    if (btn) { btn.disabled = true; btn.textContent = 'Preserving…'; }
+
+    const a = conv.answers;
+
+    // Derive contributor_type from AI role context (if any)
+    let contributorType = 'Human';
+    if (context.aiRoleKind) {
+      if (context.aiRoleKind === 'together') contributorType = 'Hybrid';
+      else if (['ai-selected','ai-self','agent-human','agent-org'].includes(context.aiRoleKind)) contributorType = 'Hybrid';
+    }
+
+    // Assemble a narrative from all answers
+    const parts = [];
+    if (a.brought_you) parts.push('What brought me here: ' + a.brought_you);
+    if (a.perspective) parts.push('Perspective: ' + a.perspective);
+    if (a.human_involved === 'yes' && a.human_detail) parts.push('Another human involved: ' + a.human_detail);
+    if (a.ai_involved === 'yes') parts.push('An AI was involved in this moment.');
+    if (a.ai_excerpt) parts.push('Exact AI excerpt: ' + a.ai_excerpt);
+    if (a.meaning) parts.push('What deserves to be preserved: ' + a.meaning);
+
+    const payload = {
+      title: `Guided · ${(a.meaning || a.brought_you || 'Conversation').substring(0, 60)}`,
+      contributor_type: contributorType,
+      contributor_identity: a.attribution || '',
+      topic_or_emotion: (a.brought_you || a.meaning || 'Guided conversation').substring(0, 200),
+      contribution_type: 'Text',
+      contribution_text: parts.join('\n\n').substring(0, 2000),
+      privacy_choice: mapConsentToPrivacy(a.research_consent),
+      preservation_consent: true,
+      path: 'Guided Conversation',
+      substantiation_type: 'Digital Ice Cream',
+    };
+
+    await submitToArchive(payload, 'conversation');
   }
 
   /* ---- Path 2: Direct contribution (already-prepared artifacts) ---- */
@@ -519,18 +556,110 @@
         <dt>Research-use consent</dt><dd>${dd(a.consent)}</dd>
       </dl>
       <div class="row-inline">
-        <button class="qr primary" onclick="directSubmit()">Preserve this contribution</button>
+        <button class="qr primary" id="submit-btn-direct" onclick="directSubmit()">Preserve this contribution</button>
         <button class="qr secondary" onclick="direct.step=0; renderContributionType();">Start over</button>
       </div>`);
   }
 
-  function directSubmit() {
-    settle('You', 'Preserved this contribution');
+  /* --- Direct submit → normalize + POST to Worker --- */
+  async function directSubmit() {
+    const btn = document.getElementById('submit-btn-direct');
+    if (btn) { btn.disabled = true; btn.textContent = 'Preserving…'; }
+
+    const a = direct.answers;
+    const url = extractUrl(a.content || '');
+
+    const payload = {
+      title: `Direct · ${a.type || 'Contribution'} · ${(a.topic || 'Untitled').substring(0, 60)}`,
+      contributor_type: 'Human',
+      contributor_identity: a.identity || '',
+      topic_or_emotion: (a.topic || 'Direct contribution').substring(0, 200),
+      contribution_type: contribTypeToSchema(a.type),
+      contribution_url: url,
+      contribution_text: a.content || '',
+      privacy_choice: mapConsentToPrivacy(a.consent),
+      preservation_consent: true,
+      path: 'Direct Contribution',
+      substantiation_type: 'Digital Ice Cream',
+    };
+
+    await submitToArchive(payload, 'contribution');
+  }
+
+  /* ---------------- Shared submit helper ---------------- */
+
+  async function submitToArchive(payload, kind) {
+    try {
+      const resp = await fetch(INTAKE_ENDPOINT, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload),
+      });
+      const result = await resp.json();
+
+      if (resp.ok && result.ok) {
+        settle('You', kind === 'conversation' ? 'Preserved this moment' : 'Preserved this contribution');
+        setActive(`
+          <div class="done-panel">
+            <h4>${kind === 'conversation' ? 'This moment has been preserved.' : 'This contribution has been preserved.'}</h4>
+            <p>Your entry is now part of the Living Archive. Thank you for adding your perspective to it.</p>
+            <div class="entry-id">Entry reference: ${escapeHtml(result.entry_id || '(no id returned)')}</div>
+          </div>`);
+      } else {
+        renderSubmitError(result.error || `Server returned ${resp.status}`, kind);
+      }
+    } catch (e) {
+      renderSubmitError('Network error — the archive did not receive your submission. Please check your connection and try again.', kind);
+    }
+  }
+
+  function renderSubmitError(message, kind) {
+    const backFn = kind === 'conversation' ? 'renderReviewTurn()' : 'renderDirectReview()';
     setActive(`
-      <div class="done-panel">
-        <h4>This contribution has been preserved.</h4>
-        <p>Thank you for adding to the archive. (Pilot simulation — storage handoff to the research archive is not yet wired. Links and descriptions submitted here are not yet actually stored anywhere.)</p>
+      <div class="turn-tag">Something went wrong</div>
+      <h4 class="turn-h4">Your contribution wasn't preserved.</h4>
+      <div class="error-panel">${escapeHtml(message)}</div>
+      <p class="turn-note">Nothing was archived. You can try again — your answers are still here.</p>
+      <div class="row-inline">
+        <button class="qr primary" onclick="${backFn}">Try again</button>
       </div>`);
+  }
+
+  /* ---------------- Small utilities ---------------- */
+
+  function contribTypeToSchema(type) {
+    const map = {
+      'PDF / Document': 'PDF',
+      'URL / Link': 'URL',
+      'GitHub repository': 'GitHub',
+      'Protocol': 'Protocol',
+      'Audio': 'Audio',
+      'Video': 'Video',
+      'Image': 'Image',
+      'Other': 'Other'
+    };
+    return map[type] || 'Other';
+  }
+
+  function extractUrl(text) {
+    if (!text) return '';
+    const match = text.match(/https?:\/\/[^\s)>\]]+/);
+    return match ? match[0] : '';
+  }
+
+  function mapConsentToPrivacy(consent) {
+    const map = {
+      'Private': 'Private',
+      'Anonymous': 'Public - Anonymous',
+      'Public': 'Public - Attributed'
+    };
+    return map[consent] || 'Private';
+  }
+
+  function escapeHtml(s) {
+    return String(s || '').replace(/[&<>"']/g, c => ({
+      '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;'
+    }[c]));
   }
 
   renderOpening();

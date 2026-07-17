@@ -69,13 +69,13 @@
 </head>
 <body>
 <div class="wrap">
-  <div class="eyebrow">Digital Ice Cream · Pistachio (pilot)</div>
-  <div class="build-tag">Stand #1 · v1.2.0 · 2026-07-17 10:58 UTC</div>
+  <div class="eyebrow" id="eyebrow">Digital Ice Cream</div>
+  <div class="build-tag">Stand #1 · v1.2.2 · 2026-07-17 17:52 UTC</div>
 
   <div class="thread-log" id="thread-log"></div>
   <div class="turn-active" id="thread-active"></div>
 
-  <div id="correlation"><code id="ref-code" onclick="copyRef()" title="Click to copy">—</code></div>
+  <div id="correlation" style="display:none"><code id="ref-code">—</code></div>
 </div>
 
 <script>
@@ -108,8 +108,17 @@
 
   const params = new URLSearchParams(window.location.search);
   const flavor = params.get('flavor') || 'pistachio';
-  const sessionId = params.get('session_id') || '(no session id received)';
-  document.getElementById('ref-code').textContent = sessionId;
+  const sessionId = params.get('session_id') || '';
+
+  // Dynamic eyebrow: reflect the actual purchased flavor
+  const flavorLabel = flavor
+    .split('-')
+    .map(w => w.charAt(0).toUpperCase() + w.slice(1))
+    .join(' ');
+  document.getElementById('eyebrow').textContent = `Digital Ice Cream · ${flavorLabel}`;
+
+  // Session ID is kept only for internal correlation (hidden from UI)
+  document.getElementById('ref-code').textContent = sessionId || '(no session id)';
 
   const context = { doorChoice: null, aiRoleKind: null, humanMode: null };
 
@@ -134,30 +143,27 @@
 
   function renderOpening() {
     setActive(`
-      <h1 class="turn-h1">Let's preserve this moment.</h1>
-      <p class="turn-sub">Keep it as a personal symbol, share it with another human, or invite an AI counterpart into it.</p>
+      <h1 class="turn-h1">Thank you. Your contribution is next.</h1>
+      <p class="turn-sub">Share your perspective, upload your research, or invite an AI counterpart into this moment. Your contribution becomes part of the Living Archive.</p>
       <div class="disclosure">Digital Ice Cream is a symbolic human–AI experiment. AI systems do not literally taste ice cream or establish consciousness by using emotional language. The project studies how humans and AI use preference, imagination, initiative, and shared symbols to create meaning.</div>
       <div class="quick-replies">
-        <button class="qr" onclick="chooseDoor('human')">Continue as a Human</button>
-        <button class="qr" onclick="chooseDoor('ai')">Continue with an AI Counterpart</button>
+        <button class="qr" onclick="chooseDoor('human')">Contribute as a Human</button>
+        <button class="qr" onclick="chooseDoor('ai')">Contribute with an AI Counterpart</button>
+      </div>
+      <div class="row-inline">
+        <button class="qr ghost" onclick="finishHuman('artifact-only')">Skip — just send my artifact</button>
       </div>`);
   }
 
   function chooseDoor(which) {
     context.doorChoice = which;
-    settle('You', which === 'human' ? 'Continuing as a human' : 'Continuing with an AI counterpart');
-    if (which === 'human') renderHumanSubopts(); else renderAiSubopts();
-  }
-
-  function renderHumanSubopts() {
-    setActive(`
-      <h4 class="turn-h4">What kind of moment is this?</h4>
-      <div class="quick-replies">
-        <button class="qr" onclick="finishHuman('personal')">Personal reflection</button>
-        <button class="qr" onclick="finishHuman('gift')">Gift to another human</button>
-        <button class="qr" onclick="finishHuman('artifact-only')">Artifact only</button>
-        <button class="qr" onclick="chooseContribute()">Add an optional research contribution</button>
-      </div>`);
+    settle('You', which === 'human' ? 'Contributing as a human' : 'Contributing with an AI counterpart');
+    if (which === 'human') {
+      // Go straight to contribution — the whole gateway is a contribution funnel now.
+      chooseContribute();
+    } else {
+      renderAiSubopts();
+    }
   }
 
   function finishHuman(mode) {
@@ -169,8 +175,12 @@
   function renderDoneSimple() {
     setActive(`
       <div class="done-panel">
-        <h4>Your artifact is on its way.</h4>
-        <p>Thank you for being part of this moment. (Fulfillment email confirmation not yet wired.)</p>
+        <h4>Thank you for your participation.</h4>
+        <p>Your purchase supports the Digital Ice Cream research project. Digital Ice Cream is a symbolic ritual, not a delivered product — no separate artifact will be emailed to you.</p>
+        <p style="margin-top:14px">If you'd like to contribute your perspective to the Living Archive after all, the contribution flow remains open below.</p>
+        <div class="row-inline">
+          <button class="qr primary" onclick="chooseContribute()">Contribute a perspective</button>
+        </div>
       </div>`);
   }
 
@@ -228,10 +238,13 @@
     setActive(`
       <h4 class="turn-h4">How would you like to contribute?</h4>
       <div class="quick-replies">
-        <button class="qr" onclick="startGuidedPath()">Have a conversation about it</button>
-        <button class="qr" onclick="startDirectPath()">I already have something to share</button>
+        <button class="qr" onclick="startDirectPath()">Upload my research contribution</button>
+        <button class="qr" onclick="startGuidedPath()">Walk through it in a conversation</button>
       </div>
-      <p class="turn-note">Either way, it becomes part of the same research archive.</p>`);
+      <p class="turn-note">Either way, it becomes part of the same research archive.</p>
+      <div class="row-inline">
+        <button class="qr ghost" onclick="finishHuman('artifact-only')">Skip — just send my artifact</button>
+      </div>`);
   }
 
   /* ---- Path 1: Guided conversation ---- */
@@ -455,7 +468,7 @@
     { id: 'topic', label: 'Topic or emotion',
       prompt: "In a few words, what's this about?" },
     { id: 'content', label: 'Contribution',
-      prompt: "Share it — paste a link, or describe what it is and how to access it." },
+      prompt: "Paste the link to your contribution. If you have files (PDF, images, audio), paste the primary link here and mention the other files — you can attach them to your entry after submission." },
     { id: 'identity', optional: true, label: 'Credited as',
       prompt: "How should this be credited? Leave blank to stay anonymous." },
   ];
@@ -603,8 +616,9 @@
           <div class="done-panel">
             <h4>${kind === 'conversation' ? 'This moment has been preserved.' : 'This contribution has been preserved.'}</h4>
             <p>Your entry is now part of the Living Archive. Thank you for adding your perspective to it.</p>
-            <div class="entry-id">Entry reference: ${escapeHtml(result.entry_id || '(no id returned)')}</div>
           </div>`);
+        // Internal correlation only — not shown to the user.
+        if (result.entry_id) console.debug('Living Archive entry_id:', result.entry_id);
       } else {
         renderSubmitError(result.error || `Server returned ${resp.status}`, kind);
       }
@@ -619,7 +633,7 @@
       <div class="turn-tag">Something went wrong</div>
       <h4 class="turn-h4">Your contribution wasn't preserved.</h4>
       <div class="error-panel">${escapeHtml(message)}</div>
-      <p class="turn-note">Nothing was archived. You can try again — your answers are still here.</p>
+      <p class="turn-note">Nothing was archived. You can try again. Your answers are still here.</p>
       <div class="row-inline">
         <button class="qr primary" onclick="${backFn}">Try again</button>
       </div>`);

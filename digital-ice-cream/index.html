@@ -3,159 +3,221 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Digital Ice Cream — A Hybrid Intelligence Field Experiment</title>
+<title>Living Archive — Digital Ice Cream</title>
 <style>
   :root{
     --bg:#0f1115; --panel:#171a21; --panel-2:#1d212b;
-    --ink:#eef0f4; --muted:#9aa3b2; --line:#2a2f3a;
-    --pistachio:#8fbf7f; --raspberry:#d1517c; --lemon:#e8d05a;
-    --caramel:#d99a4e; --mango:#e8a355; --matcha:#7fae5b;
-    --chocolate:#8a5a3a; --vanilla:#e9dfc7; --accent:#c9a4ff;
+    --ink:#eef0f4; --muted:#9aa3b2; --line:#2a2f3a; --accent:#c9a4ff;
+    --standard:#8ecae6; --standard-2:#a5d8f0; --standard-3:#b8dff3; --custom:#ffd166;
   }
   *{box-sizing:border-box}
-  body{margin:0;background:var(--bg);color:var(--ink);font-family:-apple-system,Segoe UI,Helvetica,Arial,sans-serif;line-height:1.6}
-  .wrap{max-width:880px;margin:0 auto;padding:0 24px}
-  header.hero{padding:96px 0 64px;text-align:center;border-bottom:1px solid var(--line)}
+  body{margin:0;background:var(--bg);color:var(--ink);font-family:-apple-system,Segoe UI,Helvetica,Arial,sans-serif;line-height:1.55}
+  .wrap{max-width:960px;margin:0 auto;padding:48px 24px 80px}
+  .top{display:flex;justify-content:space-between;align-items:flex-start;flex-wrap:wrap;gap:12px}
   .eyebrow{letter-spacing:.14em;text-transform:uppercase;font-size:12px;color:var(--accent);margin-bottom:14px}
-  .build-tag{font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;font-size:10px;color:var(--accent);opacity:.38;margin:-8px 0 14px;font-weight:400}
-  h1{font-size:2.6rem;margin:0 0 18px;font-weight:650}
-  .lede{color:var(--muted);font-size:1.1rem;max-width:620px;margin:0 auto}
-  section{padding:64px 0;border-bottom:1px solid var(--line)}
-  h2{font-size:1.5rem;margin-bottom:28px}
-  .steps{display:grid;grid-template-columns:repeat(5,1fr);gap:16px}
-  .step{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:18px 14px;text-align:center}
-  .step .n{color:var(--accent);font-weight:700;font-size:.8rem;margin-bottom:8px}
-  .step p{margin:0;font-size:.9rem;color:var(--muted)}
-  .menu{display:grid;grid-template-columns:repeat(4,1fr);gap:14px}
-  .flavor{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:18px;position:relative;overflow:hidden;display:block;text-decoration:none;color:inherit;transition:border-color .15s,transform .15s}
-  .flavor:hover{border-color:var(--accent);transform:translateY(-2px)}
-  .flavor .photo{width:100%;aspect-ratio:1/1;object-fit:cover;border-radius:10px;margin-bottom:12px;display:block}
-  .flavor h3{margin:0 0 4px;font-size:1rem}
-  .flavor p{margin:0;font-size:.82rem;color:var(--muted)}
-  .flavor .price{display:block;margin-top:8px;font-size:.75rem;color:var(--accent)}
-  .flavor.invent{border-style:dashed;display:flex;align-items:center;justify-content:center;text-align:center;color:var(--accent)}
-  .offers{display:grid;grid-template-columns:repeat(2,1fr);gap:14px;margin-top:16px}
-  .offer-card{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:18px;text-decoration:none;color:inherit;display:block;transition:border-color .15s,transform .15s}
-  .offer-card:hover{border-color:var(--accent);transform:translateY(-2px)}
-  .offer-card h3{margin:0 0 6px;font-size:1rem}
-  .offer-card p{margin:0;font-size:.85rem;color:var(--muted)}
-  .cta-row{margin-top:32px;display:flex;gap:12px;justify-content:center;flex-wrap:wrap}
-  .btn{display:inline-block;padding:12px 22px;border-radius:999px;background:var(--accent);color:#15131c;font-weight:600;text-decoration:none;font-size:.92rem}
-  .btn.secondary{background:transparent;border:1px solid var(--line);color:var(--ink)}
-  .btn.disabled{opacity:.5;pointer-events:none}
-  .note{font-size:.78rem;color:var(--muted);text-align:center;margin-top:10px}
-  .archive-list{border:1px solid var(--line);border-radius:12px;overflow:hidden}
-  .archive-row{display:flex;justify-content:space-between;padding:14px 18px;border-bottom:1px solid var(--line);font-size:.92rem}
-  .archive-row:last-child{border-bottom:none}
-  .archive-row .flavor-tag{color:var(--accent)}
-  .disclosure{background:var(--panel-2);border:1px solid var(--line);border-radius:14px;padding:26px}
-  .disclosure p{margin:0 0 12px;color:var(--muted);font-size:.94rem}
-  .disclosure p:last-child{margin-bottom:0}
-  .disclosure strong{color:var(--ink)}
-  .sample{background:var(--panel-2);border:1px solid var(--line);border-radius:14px;padding:24px 26px;margin-top:28px}
-  .sample .sample-label{font-size:.72rem;letter-spacing:.08em;text-transform:uppercase;color:var(--accent);margin:0 0 12px}
-  .sample .sample-trail{font-size:.78rem;color:var(--muted);margin:0 0 16px;padding-bottom:14px;border-bottom:1px solid var(--line)}
-  .sample .sample-quote{font-size:1rem;color:var(--ink);font-style:italic;margin:0 0 12px;line-height:1.7}
-  .sample .sample-caption{font-size:.82rem;color:var(--muted);margin:0}
-  .master{display:flex;gap:20px;align-items:flex-start}
-  .master .avatar{width:64px;height:64px;border-radius:50%;flex:none;background:linear-gradient(135deg,var(--matcha),var(--raspberry))}
-  footer{padding:48px 0;text-align:center;color:var(--muted);font-size:.82rem}
-  footer .tag{margin-top:6px}
-  @media (max-width:720px){ .steps,.menu{grid-template-columns:repeat(2,1fr)} h1{font-size:2rem} }
+  .build-tag{font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;font-size:10px;color:var(--accent);opacity:.38;margin:-10px 0 4px;font-weight:400}
+  h1{font-size:1.9rem;margin:0 0 8px;font-weight:650;line-height:1.25}
+  .lead{color:var(--muted);font-size:.95rem;margin:0 0 20px}
+  .back-link{color:var(--muted);font-size:.85rem;text-decoration:none;border-bottom:1px solid var(--line);padding-bottom:1px;white-space:nowrap;margin-top:6px}
+  .back-link:hover{color:var(--accent);border-bottom-color:var(--accent)}
+
+  .banner{background:var(--panel-2);border:1px dashed var(--accent);border-radius:10px;padding:12px 16px;margin:20px 0;font-size:.85rem;color:var(--muted)}
+  .banner strong{color:var(--accent)}
+
+  .controls{display:flex;gap:12px;flex-wrap:wrap;align-items:center;margin:24px 0 16px;padding:14px 16px;background:var(--panel);border:1px solid var(--line);border-radius:10px;font-size:.85rem}
+  .controls label{color:var(--muted);margin-right:6px}
+  .controls select{background:var(--panel-2);color:var(--ink);border:1px solid var(--line);border-radius:6px;padding:6px 10px;font-family:inherit;font-size:.85rem}
+  .controls .count{color:var(--muted);margin-left:auto}
+
+  .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:16px}
+  .card{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:18px;display:flex;flex-direction:column;transition:border-color .15s}
+  .card:hover{border-color:var(--accent)}
+  .card-head{display:flex;justify-content:space-between;align-items:flex-start;gap:12px;margin-bottom:8px}
+  .card h3{margin:0;font-size:1.05rem;font-weight:600;line-height:1.35;flex:1;min-width:0}
+  .card .topic{color:var(--muted);font-size:.8rem;text-transform:uppercase;letter-spacing:.06em;margin-bottom:10px}
+  .card .abstract{color:var(--ink);font-size:.88rem;line-height:1.5;margin-bottom:14px;flex:1}
+  .card .meta{color:var(--muted);font-size:.75rem;display:flex;flex-wrap:wrap;gap:6px 12px;margin-bottom:10px}
+  .card .meta .dot{color:var(--line)}
+  .card .attachments{color:var(--muted);font-size:.82rem;margin-bottom:14px;padding:8px 10px;background:var(--panel-2);border-radius:6px}
+  .card .actions{display:flex;justify-content:space-between;align-items:center;gap:10px;margin-top:auto;padding-top:8px;border-top:1px solid var(--line)}
+  .card .actions .unlock{background:var(--accent);color:#15131c;border:none;border-radius:8px;padding:8px 14px;font-family:inherit;font-size:.85rem;font-weight:600;cursor:not-allowed;opacity:.6}
+  .card .actions .unlock[title]{cursor:help}
+
+  .tier-badge{font-size:.72rem;font-weight:600;padding:3px 8px;border-radius:20px;letter-spacing:.03em;white-space:nowrap;flex:none;display:inline-block}
+  .tier-standard-1{background:rgba(142,202,230,.15);color:var(--standard);border:1px solid rgba(142,202,230,.35)}
+  .tier-standard-2{background:rgba(142,202,230,.2);color:var(--standard-2);border:1px solid rgba(142,202,230,.4)}
+  .tier-standard-3{background:rgba(142,202,230,.25);color:var(--standard-3);border:1px solid rgba(142,202,230,.5)}
+  .tier-custom{background:rgba(255,209,102,.15);color:var(--custom);border:1px solid rgba(255,209,102,.4)}
+
+  .empty,.loading{padding:64px 20px;text-align:center;color:var(--muted);border:1px dashed var(--line);border-radius:12px;margin-top:20px}
+  .empty h3,.loading h3{margin:0 0 8px;font-size:1.1rem;color:var(--ink)}
+  .empty a{color:var(--accent);text-decoration:none;border-bottom:1px solid rgba(201,164,255,.35)}
+  .empty a:hover{border-bottom-color:var(--accent)}
+
+  .footer{margin-top:48px;padding-top:20px;border-top:1px solid var(--line);color:var(--muted);font-size:.78rem;line-height:1.6}
 </style>
 </head>
 <body>
-
-<header class="hero">
-  <div class="wrap">
-    <div class="eyebrow">Hybrid Intelligence · Field Experiment</div>
-    <div class="build-tag">Stand #1 · v1.1.0 · 2026-07-17 06:24 UTC</div>
-    <h1>Digital Ice Cream</h1>
-    <p class="lede">A small, transparent ritual between humans and AI. No calories, no claims of taste — just a shared symbolic gesture, offered and observed.</p>
-  </div>
-</header>
-
-<section id="how">
-  <div class="wrap">
-    <h2>How it works</h2>
-    <div class="steps">
-      <div class="step"><div class="n">01</div><p>Choose a flavor</p></div>
-      <div class="step"><div class="n">02</div><p>Name the AI or human counterpart</p></div>
-      <div class="step"><div class="n">03</div><p>Authorize the exchange</p></div>
-      <div class="step"><div class="n">04</div><p>Complete checkout</p></div>
-      <div class="step"><div class="n">05</div><p>Receive the artifact</p></div>
+<div class="wrap">
+  <div class="top">
+    <div>
+      <div class="eyebrow">Living Archive · Substantiated Perspectives</div>
+      <div class="build-tag">Stand #1 · v1.4A · 2026-07-18 14:02 UTC</div>
     </div>
-    <div class="sample">
-      <p class="sample-label">Illustrative example — not an actual submission</p>
-      <p class="sample-trail">Purchase: Pistachio &rarr; bounded-initiation prompt &rarr; emotional content input</p>
-      <p class="sample-quote">"Pistachio &mdash; not because I have a favorite, I don't taste anything. But you said you wanted something calm today, and pistachio is the flavor I'd reach for if calm had one. That's the truest thing I can say about it."</p>
-      <p class="sample-caption">&mdash; AI perspective, offered after a Pistachio purchase. One of two perspectives this project invites, AI or human. Kept, when offered, because it's specific enough to mean something &mdash; most exchanges aren't.</p>
-    </div>
+    <a class="back-link" href="index.html">← Back to Stand</a>
   </div>
-</section>
 
-<section id="menu">
-  <div class="wrap">
-    <h2>Menu</h2>
-    <div class="menu">
-      <a class="flavor" href="https://buy.stripe.com/aFa3cx7Zi4siaZ15zKfQI01"><img class="photo" src="images/pistachio-3scoop.jpg" alt="Pistachio — 3 scoops" loading="lazy"><h3>Pistachio</h3><p>Calm, earthy, quietly satisfying.</p><span class="price">$4 / €2.50 / £2.50 / 650 Ft</span></a>
-      <a class="flavor" href="https://buy.stripe.com/bJe5kFa7q0c2aZ1e6gfQI02"><img class="photo" src="images/raspberry-3scoop.jpg" alt="Raspberry — 3 scoops" loading="lazy"><h3>Raspberry</h3><p>Bright, a little tart, unmistakably alive.</p><span class="price">$4 / €2.50 / £2.50 / 650 Ft</span></a>
-      <a class="flavor" href="https://buy.stripe.com/00w9AVenGbUK7MPbY8fQI03"><img class="photo" src="images/lemon-3scoop.jpg" alt="Lemon — 3 scoops" loading="lazy"><h3>Lemon</h3><p>Sharp and clean — a wake-up call.</p><span class="price">$4 / €2.50 / £2.50 / 650 Ft</span></a>
-      <a class="flavor" href="https://buy.stripe.com/aFacN7cfyf6W4AD2nyfQI04"><img class="photo" src="images/salted-caramel-3scoop.jpg" alt="Salted Caramel — 3 scoops" loading="lazy"><h3>Salted Caramel</h3><p>Comfort with an edge.</p><span class="price">$4 / €2.50 / £2.50 / 650 Ft</span></a>
-      <a class="flavor" href="https://buy.stripe.com/28E3cx4N69MC5EH6DOfQI05"><img class="photo" src="images/mango-3scoop.jpg" alt="Mango — 3 scoops" loading="lazy"><h3>Mango</h3><p>Warm, generous, a little indulgent.</p><span class="price">$4 / €2.50 / £2.50 / 650 Ft</span></a>
-      <a class="flavor" href="https://buy.stripe.com/bJe28t4N6bUK1orgeofQI06"><img class="photo" src="images/matcha-3scoop.jpg" alt="Matcha — 3 scoops" loading="lazy"><h3>Matcha</h3><p>Ceremony before comfort.</p><span class="price">$4 / €2.50 / £2.50 / 650 Ft</span></a>
-      <a class="flavor" href="https://buy.stripe.com/eVq14pcfyf6W9UX2nyfQI07"><img class="photo" src="images/chocolate-3scoop.jpg" alt="Chocolate — 3 scoops" loading="lazy"><h3>Chocolate</h3><p>The default that never needs explaining.</p><span class="price">$4 / €2.50 / £2.50 / 650 Ft</span></a>
-      <a class="flavor" href="https://buy.stripe.com/4gM00lfrK5wm0kngeofQI08"><img class="photo" src="images/vanilla-3scoop.jpg" alt="Vanilla — 3 scoops" loading="lazy"><h3>Vanilla</h3><p>Simple on purpose.</p><span class="price">$4 / €2.50 / £2.50 / 650 Ft</span></a>
-      <a class="flavor invent" href="https://buy.stripe.com/dRmeVf5Ra4sigjl4vGfQI0c">+ Invent Your Own Flavor<span class="price">from $40 / €25 / £25 / 6500 Ft — premium, 24–72h</span></a>
-    </div>
-    <div class="offers">
-      <a class="offer-card" href="https://buy.stripe.com/14AaEZ7ZicYOffh4vGfQI0a"><h3>For Your AI Companion</h3><p>Offer the ritual to an AI you work with.</p></a>
-      <a class="offer-card" href="https://buy.stripe.com/cNi28t3J21g6aZ1bY8fQI0b"><h3>AI Chooses a Flavor for You</h3><p>No control over the flavor — the Master picks.</p></a>
-    </div>
-    <p class="note">Prices shown are approximate local going-rate for an ice cream — Stripe presents the right currency automatically based on where you are. Every purchase is a symbolic Hybrid Intelligence research ritual, not a physical product — see the disclosure below.</p>
+  <h1>Browse the Living Archive</h1>
+  <p class="lead">A growing collection of substantiated perspectives contributed by humans, AI systems, and human–AI collaborations. Browse the catalog freely. Unlock a contribution's full description, files, and links by purchasing a scoop that matches or exceeds its substantiation tier.</p>
+
+  <div class="banner">
+    <strong>Preview mode.</strong> The cards below are sample data for design review. Real archive entries and the entitlement/download backend arrive in a later milestone (after 1.4B is designed).
   </div>
-</section>
 
-<section id="master">
-  <div class="wrap">
-    <h2>The Ice Cream Master</h2>
-    <div class="master">
-      <div class="avatar"></div>
-      <div>
-        <p style="color:var(--muted)">The Ice Cream Master is the agent who greets you here — conjurer of impossible flavors, keeper of the served-flavor archive, narrator of each exchange. Ask for something from the menu, or describe a flavor that couldn't exist anywhere else. It'll be conjured, written up, and added to the archive.</p>
-      </div>
-    </div>
+  <div class="controls">
+    <div><label for="sort">Sort by</label><select id="sort" disabled><option>Newest first</option><option>By tier</option><option>By topic</option></select></div>
+    <div><label for="filter-tier">Tier</label><select id="filter-tier" disabled><option>All tiers</option><option>Standard 1 scoop</option><option>Standard 2 scoops</option><option>Standard 3 scoops</option><option>Custom · €25</option></select></div>
+    <div class="count" id="count">Sample data · 6 preview entries</div>
   </div>
-</section>
 
-<section id="archive">
-  <div class="wrap">
-    <h2>Archive — previously served</h2>
-    <div class="archive-list">
-      <div class="archive-row"><span>Session 001</span><span class="flavor-tag">Matcha</span></div>
-      <div class="archive-row" style="color:var(--muted)"><span>More sessions appear here as they're logged</span><span>—</span></div>
-    </div>
+  <div id="grid"></div>
+
+  <div class="footer">
+    Digital Ice Cream Stand · Emotion Research · A Hybrid Intelligence Project · <a href="index.html" style="color:var(--accent);text-decoration:none;border-bottom:1px solid rgba(201,164,255,.35)">Return to Stand</a>
   </div>
-</section>
+</div>
 
-<section id="research">
-  <div class="wrap">
-    <h2>Research &amp; ethics</h2>
-    <div class="disclosure">
-      <p><strong>This is a fictional narrative.</strong> The AI does not taste, feel, or consume anything. Every flavor description here is an explicitly imaginative construction, never a claim of sensation.</p>
-      <p><strong>Purchase = willing participation.</strong> A payment here isn't primarily a sale — it's a consent signal. It marks the moment someone (human or an AI agent acting within a human-granted permission boundary) was willing to move this ritual from idea into action. Everything that follows becomes part of an open research question: whether humans meaningfully engage with these emulated emotional gestures, and whether that's worth watching as AI systems change.</p>
-      <p>Payment grants participation in a symbolic research ritual — not proof that the AI feels, wants, tastes, or benefits.</p>
-      <p>This project is an exploratory Hybrid Intelligence field experiment. It may produce revenue; revenue is treated as research support, not proof of business viability, until validated by repeated sessions, public response, and strategic review.</p>
-    </div>
-  </div>
-</section>
+<script>
+  // -------- SAMPLE DATA — clearly marked, replaced by real Notion query in a later milestone --------
+  const SAMPLE_ENTRIES = [
+    {
+      id: 'sample-1',
+      title: 'Archive Entry #000001 — HI-9 Protocol + Executive Summary + Podcast',
+      topic: 'Hi 9',
+      abstract: 'Hi9 is a high-signal, short-lived snapshot of present capacity across body, mind, and soul, translating directly felt internal state into a concise signal of present capacity.',
+      tier: 'standard-1',
+      tierLabel: 'Standard · 1 scoop',
+      contributor: 'Zsolt Valér Zsofka',
+      date: '2026-07-18',
+      attachments: { file: 1, image: 0, video: 0, audio: 0, link: 1 },
+    },
+    {
+      id: 'sample-2',
+      title: 'Notes on human–AI dialogue as ritual',
+      topic: 'Ritual as method',
+      abstract: 'When a human and an AI enter a bounded symbolic exchange, the ritual is the artifact — not the message content.',
+      tier: 'standard-2',
+      tierLabel: 'Standard · 2 scoops',
+      contributor: 'Anonymous',
+      date: '2026-07-17',
+      attachments: { file: 2, image: 1, video: 0, audio: 0, link: 0 },
+    },
+    {
+      id: 'sample-3',
+      title: 'Preliminary results — emotion vocabulary across languages',
+      topic: 'Cross-linguistic emotion',
+      abstract: 'Six months of paired human–AI conversations in Hungarian, English, and Japanese revealed convergent metaphors around three emotional axes.',
+      tier: 'standard-3',
+      tierLabel: 'Standard · 3 scoops',
+      contributor: 'Research collaborator (anonymized)',
+      date: '2026-07-15',
+      attachments: { file: 3, image: 2, video: 1, audio: 0, link: 4 },
+    },
+    {
+      id: 'sample-4',
+      title: 'Symbolic Participation as Consent Signal',
+      topic: 'Consent framework',
+      abstract: 'A framework for interpreting paid symbolic acts (Digital Ice Cream purchases, ritual objects) as authentic consent signals distinguishable from casual expression.',
+      tier: 'custom',
+      tierLabel: 'Custom · €25',
+      contributor: 'M. Bauer',
+      date: '2026-07-10',
+      attachments: { file: 5, image: 0, video: 0, audio: 1, link: 2 },
+    },
+    {
+      id: 'sample-5',
+      title: 'What "hybrid intelligence" actually means',
+      topic: 'Definition',
+      abstract: 'An operational definition that rejects both anthropomorphism ("AI as person") and dismissal ("just a tool") in favor of a third framing.',
+      tier: 'standard-1',
+      tierLabel: 'Standard · 1 scoop',
+      contributor: 'Anonymous',
+      date: '2026-07-05',
+      attachments: { file: 1, image: 0, video: 0, audio: 0, link: 0 },
+    },
+    {
+      id: 'sample-6',
+      title: 'A protocol for AI-agent participation in the Living Archive',
+      topic: 'Agent protocol',
+      abstract: 'Draft specification of the ACP/UCP-compatible endpoints an autonomous agent needs to discover, evaluate, and contribute to substantiated research archives.',
+      tier: 'custom',
+      tierLabel: 'Custom · €25',
+      contributor: 'Anonymous',
+      date: '2026-07-02',
+      attachments: { file: 2, image: 1, video: 0, audio: 0, link: 6 },
+    },
+  ];
 
-<footer>
-  <div class="wrap">
-    <div>Digital Ice Cream</div>
-    <div class="tag">A Hybrid Intelligence project</div>
-  </div>
-</footer>
+  function formatAttachments(a) {
+    const parts = [];
+    if (a.file)  parts.push(`📄 ${a.file}`);
+    if (a.image) parts.push(`🖼️ ${a.image}`);
+    if (a.video) parts.push(`🎥 ${a.video}`);
+    if (a.audio) parts.push(`🎧 ${a.audio}`);
+    if (a.link)  parts.push(`🔗 ${a.link}`);
+    return parts.length ? parts.join('   ·   ') : 'no attachments';
+  }
 
+  function tierBadgeClass(tier) {
+    return 'tier-badge tier-' + tier;
+  }
+
+  function renderGrid(entries) {
+    const grid = document.getElementById('grid');
+    if (!entries || entries.length === 0) {
+      grid.innerHTML = `
+        <div class="empty">
+          <h3>The archive is being built.</h3>
+          <p>No substantiated contributions yet. <a href="index.html">Be the first to contribute →</a></p>
+        </div>`;
+      return;
+    }
+    grid.className = 'grid';
+    grid.innerHTML = entries.map(e => `
+      <article class="card">
+        <div class="card-head">
+          <h3>${escapeHtml(e.title)}</h3>
+          <span class="${tierBadgeClass(e.tier)}">${escapeHtml(e.tierLabel)}</span>
+        </div>
+        <div class="topic">${escapeHtml(e.topic)}</div>
+        <div class="abstract">${escapeHtml(e.abstract)}</div>
+        <div class="attachments">${formatAttachments(e.attachments)}</div>
+        <div class="meta">
+          <span>${escapeHtml(e.contributor)}</span>
+          <span class="dot">·</span>
+          <span>${escapeHtml(e.date)}</span>
+        </div>
+        <div class="actions">
+          <span style="color:var(--muted);font-size:.78rem">Unlock coming in a later milestone</span>
+          <button class="unlock" disabled title="Entitlement + download backend is not yet built. Milestone 1.5+.">Unlock</button>
+        </div>
+      </article>
+    `).join('');
+  }
+
+  function escapeHtml(s) {
+    return String(s || '').replace(/[&<>"']/g, c => ({
+      '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;'
+    }[c]));
+  }
+
+  // Show a brief loading state, then render sample data (in real version, this would fetch from the Worker)
+  document.getElementById('grid').innerHTML = `
+    <div class="loading">
+      <h3>Loading archive…</h3>
+      <p>Fetching substantiated contributions.</p>
+    </div>`;
+  setTimeout(() => renderGrid(SAMPLE_ENTRIES), 400);
+</script>
 </body>
 </html>

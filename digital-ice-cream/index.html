@@ -3,221 +3,197 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Living Archive — Digital Ice Cream</title>
+<title>Digital Ice Cream — Hybrid Intelligence Stand #1</title>
 <style>
   :root{
     --bg:#0f1115; --panel:#171a21; --panel-2:#1d212b;
     --ink:#eef0f4; --muted:#9aa3b2; --line:#2a2f3a; --accent:#c9a4ff;
-    --standard:#8ecae6; --standard-2:#a5d8f0; --standard-3:#b8dff3; --custom:#ffd166;
   }
   *{box-sizing:border-box}
-  body{margin:0;background:var(--bg);color:var(--ink);font-family:-apple-system,Segoe UI,Helvetica,Arial,sans-serif;line-height:1.55}
-  .wrap{max-width:960px;margin:0 auto;padding:48px 24px 80px}
-  .top{display:flex;justify-content:space-between;align-items:flex-start;flex-wrap:wrap;gap:12px}
-  .eyebrow{letter-spacing:.14em;text-transform:uppercase;font-size:12px;color:var(--accent);margin-bottom:14px}
+  body{margin:0;background:var(--bg);color:var(--ink);font-family:-apple-system,Segoe UI,Helvetica,Arial,sans-serif;line-height:1.6}
+  .wrap{max-width:720px;margin:0 auto;padding:56px 24px 80px}
+  .eyebrow{letter-spacing:.14em;text-transform:uppercase;font-size:12px;color:var(--accent);margin-bottom:18px}
   .build-tag{font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;font-size:10px;color:var(--accent);opacity:.38;margin:-10px 0 4px;font-weight:400}
-  h1{font-size:1.9rem;margin:0 0 8px;font-weight:650;line-height:1.25}
-  .lead{color:var(--muted);font-size:.95rem;margin:0 0 20px}
-  .back-link{color:var(--muted);font-size:.85rem;text-decoration:none;border-bottom:1px solid var(--line);padding-bottom:1px;white-space:nowrap;margin-top:6px}
-  .back-link:hover{color:var(--accent);border-bottom-color:var(--accent)}
+  h1{font-size:2rem;margin:0 0 12px;font-weight:650;line-height:1.25}
+  .lead{color:var(--muted);font-size:1rem;margin:0 0 28px}
+  .disclosure{background:var(--panel-2);border:1px solid var(--line);border-radius:12px;padding:16px 18px;font-size:.82rem;color:var(--muted);margin:18px 0 28px}
 
-  .banner{background:var(--panel-2);border:1px dashed var(--accent);border-radius:10px;padding:12px 16px;margin:20px 0;font-size:.85rem;color:var(--muted)}
-  .banner strong{color:var(--accent)}
+  .stage{opacity:0;transform:translateY(8px);transition:opacity .28s ease,transform .28s ease}
+  .stage.in{opacity:1;transform:translateY(0)}
+  .stage h2{font-size:1.1rem;margin:0 0 16px;font-weight:600;line-height:1.4}
 
-  .controls{display:flex;gap:12px;flex-wrap:wrap;align-items:center;margin:24px 0 16px;padding:14px 16px;background:var(--panel);border:1px solid var(--line);border-radius:10px;font-size:.85rem}
-  .controls label{color:var(--muted);margin-right:6px}
-  .controls select{background:var(--panel-2);color:var(--ink);border:1px solid var(--line);border-radius:6px;padding:6px 10px;font-family:inherit;font-size:.85rem}
-  .controls .count{color:var(--muted);margin-left:auto}
+  .qr{display:block;width:100%;text-align:left;background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:14px 18px;color:var(--ink);cursor:pointer;font-size:.95rem;font-family:inherit;transition:border-color .15s;margin-bottom:10px}
+  .qr:hover{border-color:var(--accent)}
+  .qr .sub{display:block;color:var(--muted);font-size:.82rem;margin-top:4px}
+  .qr.ghost{background:none;color:var(--muted);font-size:.85rem;text-decoration:underline;border:none;padding:8px 0;width:auto;display:inline-block;margin-top:8px}
 
-  .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:16px}
-  .card{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:18px;display:flex;flex-direction:column;transition:border-color .15s}
+  .settled{color:var(--muted);font-size:.85rem;padding:8px 2px;border-left:2px solid var(--accent);padding-left:10px;margin-bottom:12px}
+
+  .menu{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:14px;margin-top:20px}
+  .card{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:14px;text-decoration:none;color:var(--ink);transition:border-color .15s;display:flex;flex-direction:column}
   .card:hover{border-color:var(--accent)}
-  .card-head{display:flex;justify-content:space-between;align-items:flex-start;gap:12px;margin-bottom:8px}
-  .card h3{margin:0;font-size:1.05rem;font-weight:600;line-height:1.35;flex:1;min-width:0}
-  .card .topic{color:var(--muted);font-size:.8rem;text-transform:uppercase;letter-spacing:.06em;margin-bottom:10px}
-  .card .abstract{color:var(--ink);font-size:.88rem;line-height:1.5;margin-bottom:14px;flex:1}
-  .card .meta{color:var(--muted);font-size:.75rem;display:flex;flex-wrap:wrap;gap:6px 12px;margin-bottom:10px}
-  .card .meta .dot{color:var(--line)}
-  .card .attachments{color:var(--muted);font-size:.82rem;margin-bottom:14px;padding:8px 10px;background:var(--panel-2);border-radius:6px}
-  .card .actions{display:flex;justify-content:space-between;align-items:center;gap:10px;margin-top:auto;padding-top:8px;border-top:1px solid var(--line)}
-  .card .actions .unlock{background:var(--accent);color:#15131c;border:none;border-radius:8px;padding:8px 14px;font-family:inherit;font-size:.85rem;font-weight:600;cursor:not-allowed;opacity:.6}
-  .card .actions .unlock[title]{cursor:help}
+  .card .img{width:100%;aspect-ratio:1/1;border-radius:8px;background:var(--panel-2) center/cover no-repeat;margin-bottom:12px}
+  .card h4{margin:0 0 4px;font-size:1rem}
+  .card .price{color:var(--muted);font-size:.85rem}
+  .menu-note{color:var(--muted);font-size:.83rem;margin-top:14px}
 
-  .tier-badge{font-size:.72rem;font-weight:600;padding:3px 8px;border-radius:20px;letter-spacing:.03em;white-space:nowrap;flex:none;display:inline-block}
-  .tier-standard-1{background:rgba(142,202,230,.15);color:var(--standard);border:1px solid rgba(142,202,230,.35)}
-  .tier-standard-2{background:rgba(142,202,230,.2);color:var(--standard-2);border:1px solid rgba(142,202,230,.4)}
-  .tier-standard-3{background:rgba(142,202,230,.25);color:var(--standard-3);border:1px solid rgba(142,202,230,.5)}
-  .tier-custom{background:rgba(255,209,102,.15);color:var(--custom);border:1px solid rgba(255,209,102,.4)}
+  .placeholder-panel{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:20px;margin-top:16px}
+  .placeholder-panel h3{margin:0 0 10px;font-size:1rem}
+  .placeholder-panel p{color:var(--muted);font-size:.9rem;margin:0}
 
-  .empty,.loading{padding:64px 20px;text-align:center;color:var(--muted);border:1px dashed var(--line);border-radius:12px;margin-top:20px}
-  .empty h3,.loading h3{margin:0 0 8px;font-size:1.1rem;color:var(--ink)}
-  .empty a{color:var(--accent);text-decoration:none;border-bottom:1px solid rgba(201,164,255,.35)}
-  .empty a:hover{border-bottom-color:var(--accent)}
-
-  .footer{margin-top:48px;padding-top:20px;border-top:1px solid var(--line);color:var(--muted);font-size:.78rem;line-height:1.6}
+  a.plain{color:var(--accent);text-decoration:none;border-bottom:1px solid rgba(201,164,255,.35)}
+  a.plain:hover{border-bottom-color:var(--accent)}
 </style>
 </head>
 <body>
 <div class="wrap">
-  <div class="top">
-    <div>
-      <div class="eyebrow">Living Archive · Substantiated Perspectives</div>
-      <div class="build-tag">Stand #1 · v1.4A · 2026-07-18 14:02 UTC</div>
-    </div>
-    <a class="back-link" href="index.html">← Back to Stand</a>
-  </div>
+  <div class="eyebrow">Hybrid Intelligence · Field Experiment</div>
+  <div class="build-tag">Stand #1 · v1.4A · 2026-07-18 14:02 UTC</div>
+  <h1>Digital Ice Cream</h1>
+  <p class="lead">A symbolic Human–AI ritual studying how meaning is co-created. Each substantiated contribution becomes part of a Living Archive.</p>
 
-  <h1>Browse the Living Archive</h1>
-  <p class="lead">A growing collection of substantiated perspectives contributed by humans, AI systems, and human–AI collaborations. Browse the catalog freely. Unlock a contribution's full description, files, and links by purchasing a scoop that matches or exceeds its substantiation tier.</p>
+  <div class="disclosure">Digital Ice Cream is a symbolic human–AI experiment. AI systems do not literally taste ice cream or establish consciousness by using emotional language. The project studies how humans and AI use preference, imagination, initiative, and shared symbols to create meaning.</div>
 
-  <div class="banner">
-    <strong>Preview mode.</strong> The cards below are sample data for design review. Real archive entries and the entitlement/download backend arrive in a later milestone (after 1.4B is designed).
-  </div>
-
-  <div class="controls">
-    <div><label for="sort">Sort by</label><select id="sort" disabled><option>Newest first</option><option>By tier</option><option>By topic</option></select></div>
-    <div><label for="filter-tier">Tier</label><select id="filter-tier" disabled><option>All tiers</option><option>Standard 1 scoop</option><option>Standard 2 scoops</option><option>Standard 3 scoops</option><option>Custom · €25</option></select></div>
-    <div class="count" id="count">Sample data · 6 preview entries</div>
-  </div>
-
-  <div id="grid"></div>
-
-  <div class="footer">
-    Digital Ice Cream Stand · Emotion Research · A Hybrid Intelligence Project · <a href="index.html" style="color:var(--accent);text-decoration:none;border-bottom:1px solid rgba(201,164,255,.35)">Return to Stand</a>
-  </div>
+  <div id="settled-log"></div>
+  <div class="stage" id="stage"></div>
 </div>
 
 <script>
-  // -------- SAMPLE DATA — clearly marked, replaced by real Notion query in a later milestone --------
-  const SAMPLE_ENTRIES = [
-    {
-      id: 'sample-1',
-      title: 'Archive Entry #000001 — HI-9 Protocol + Executive Summary + Podcast',
-      topic: 'Hi 9',
-      abstract: 'Hi9 is a high-signal, short-lived snapshot of present capacity across body, mind, and soul, translating directly felt internal state into a concise signal of present capacity.',
-      tier: 'standard-1',
-      tierLabel: 'Standard · 1 scoop',
-      contributor: 'Zsolt Valér Zsofka',
-      date: '2026-07-18',
-      attachments: { file: 1, image: 0, video: 0, audio: 0, link: 1 },
-    },
-    {
-      id: 'sample-2',
-      title: 'Notes on human–AI dialogue as ritual',
-      topic: 'Ritual as method',
-      abstract: 'When a human and an AI enter a bounded symbolic exchange, the ritual is the artifact — not the message content.',
-      tier: 'standard-2',
-      tierLabel: 'Standard · 2 scoops',
-      contributor: 'Anonymous',
-      date: '2026-07-17',
-      attachments: { file: 2, image: 1, video: 0, audio: 0, link: 0 },
-    },
-    {
-      id: 'sample-3',
-      title: 'Preliminary results — emotion vocabulary across languages',
-      topic: 'Cross-linguistic emotion',
-      abstract: 'Six months of paired human–AI conversations in Hungarian, English, and Japanese revealed convergent metaphors around three emotional axes.',
-      tier: 'standard-3',
-      tierLabel: 'Standard · 3 scoops',
-      contributor: 'Research collaborator (anonymized)',
-      date: '2026-07-15',
-      attachments: { file: 3, image: 2, video: 1, audio: 0, link: 4 },
-    },
-    {
-      id: 'sample-4',
-      title: 'Symbolic Participation as Consent Signal',
-      topic: 'Consent framework',
-      abstract: 'A framework for interpreting paid symbolic acts (Digital Ice Cream purchases, ritual objects) as authentic consent signals distinguishable from casual expression.',
-      tier: 'custom',
-      tierLabel: 'Custom · €25',
-      contributor: 'M. Bauer',
-      date: '2026-07-10',
-      attachments: { file: 5, image: 0, video: 0, audio: 1, link: 2 },
-    },
-    {
-      id: 'sample-5',
-      title: 'What "hybrid intelligence" actually means',
-      topic: 'Definition',
-      abstract: 'An operational definition that rejects both anthropomorphism ("AI as person") and dismissal ("just a tool") in favor of a third framing.',
-      tier: 'standard-1',
-      tierLabel: 'Standard · 1 scoop',
-      contributor: 'Anonymous',
-      date: '2026-07-05',
-      attachments: { file: 1, image: 0, video: 0, audio: 0, link: 0 },
-    },
-    {
-      id: 'sample-6',
-      title: 'A protocol for AI-agent participation in the Living Archive',
-      topic: 'Agent protocol',
-      abstract: 'Draft specification of the ACP/UCP-compatible endpoints an autonomous agent needs to discover, evaluate, and contribute to substantiated research archives.',
-      tier: 'custom',
-      tierLabel: 'Custom · €25',
-      contributor: 'Anonymous',
-      date: '2026-07-02',
-      attachments: { file: 2, image: 1, video: 0, audio: 0, link: 6 },
-    },
+  const state = { identity: null, intent: null };
+
+  const FLAVORS = [
+    { key: 'pistachio',      name: 'Pistachio',       img: 'images/pistachio-3scoop.jpg',      url: 'https://buy.stripe.com/aFa3cx7Zi4siaZ15zKfQI01' },
+    { key: 'raspberry',      name: 'Raspberry',       img: 'images/raspberry-3scoop.jpg',      url: 'https://buy.stripe.com/bJe5kFa7q0c2aZ1e6gfQI02' },
+    { key: 'lemon',          name: 'Lemon',           img: 'images/lemon-3scoop.jpg',          url: 'https://buy.stripe.com/00w9AVenGbUK7MPbY8fQI03' },
+    { key: 'salted-caramel', name: 'Salted Caramel',  img: 'images/salted-caramel-3scoop.jpg', url: 'https://buy.stripe.com/aFacN7cfyf6W4AD2nyfQI04' },
+    { key: 'mango',          name: 'Mango',           img: 'images/mango-3scoop.jpg',          url: 'https://buy.stripe.com/28E3cx4N69MC5EH6DOfQI05' },
+    { key: 'matcha',         name: 'Matcha',          img: 'images/matcha-3scoop.jpg',         url: 'https://buy.stripe.com/bJe28t4N6bUK1orgeofQI06' },
+    { key: 'chocolate',      name: 'Chocolate',       img: 'images/chocolate-3scoop.jpg',      url: 'https://buy.stripe.com/eVq14pcfyf6W9UX2nyfQI07' },
+    { key: 'vanilla',        name: 'Vanilla',         img: 'images/vanilla-3scoop.jpg',        url: 'https://buy.stripe.com/4gM00lfrK5wm0kngeofQI08' },
   ];
 
-  function formatAttachments(a) {
-    const parts = [];
-    if (a.file)  parts.push(`📄 ${a.file}`);
-    if (a.image) parts.push(`🖼️ ${a.image}`);
-    if (a.video) parts.push(`🎥 ${a.video}`);
-    if (a.audio) parts.push(`🎧 ${a.audio}`);
-    if (a.link)  parts.push(`🔗 ${a.link}`);
-    return parts.length ? parts.join('   ·   ') : 'no attachments';
+  const CUSTOM_URL    = 'https://buy.stripe.com/aFa8wRa7q7Eud795zKfQI09';
+  const COMPANION_URL = 'https://buy.stripe.com/14AaEZ7ZicYOffh4vGfQI0a';
+  const AI_CHOOSES_URL = 'https://buy.stripe.com/cNi28t3J21g6aZ1bY8fQI0b';
+
+  function settle(label, value) {
+    const log = document.getElementById('settled-log');
+    const el = document.createElement('div');
+    el.className = 'settled';
+    el.innerHTML = `<strong style="color:var(--accent);font-weight:600">${label}:</strong> ${value}`;
+    log.appendChild(el);
   }
 
-  function tierBadgeClass(tier) {
-    return 'tier-badge tier-' + tier;
+  function setStage(html, after) {
+    const stage = document.getElementById('stage');
+    stage.classList.remove('in');
+    setTimeout(() => {
+      stage.innerHTML = html;
+      if (after) after();
+      requestAnimationFrame(() => stage.classList.add('in'));
+      stage.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }, 180);
   }
 
-  function renderGrid(entries) {
-    const grid = document.getElementById('grid');
-    if (!entries || entries.length === 0) {
-      grid.innerHTML = `
-        <div class="empty">
-          <h3>The archive is being built.</h3>
-          <p>No substantiated contributions yet. <a href="index.html">Be the first to contribute →</a></p>
-        </div>`;
-      return;
+  function renderIdentityGate() {
+    setStage(`
+      <h2>Who's arriving at the Stand?</h2>
+      <button class="qr" onclick="chooseIdentity('human')">
+        A Human
+        <span class="sub">Real person, curious about the archive or ready to contribute.</span>
+      </button>
+      <button class="qr" onclick="chooseIdentity('ai')">
+        An AI Agent
+        <span class="sub">Autonomous or delegated AI acting on behalf of a person or organization.</span>
+      </button>
+    `);
+  }
+
+  function chooseIdentity(id) {
+    state.identity = id;
+    settle('Visitor', id === 'human' ? 'A human' : 'An AI Agent');
+    if (id === 'human') {
+      renderIntentGate();
+    } else {
+      renderAiAgentPlaceholder();
     }
-    grid.className = 'grid';
-    grid.innerHTML = entries.map(e => `
-      <article class="card">
-        <div class="card-head">
-          <h3>${escapeHtml(e.title)}</h3>
-          <span class="${tierBadgeClass(e.tier)}">${escapeHtml(e.tierLabel)}</span>
-        </div>
-        <div class="topic">${escapeHtml(e.topic)}</div>
-        <div class="abstract">${escapeHtml(e.abstract)}</div>
-        <div class="attachments">${formatAttachments(e.attachments)}</div>
-        <div class="meta">
-          <span>${escapeHtml(e.contributor)}</span>
-          <span class="dot">·</span>
-          <span>${escapeHtml(e.date)}</span>
-        </div>
-        <div class="actions">
-          <span style="color:var(--muted);font-size:.78rem">Unlock coming in a later milestone</span>
-          <button class="unlock" disabled title="Entitlement + download backend is not yet built. Milestone 1.5+.">Unlock</button>
-        </div>
-      </article>
-    `).join('');
   }
 
-  function escapeHtml(s) {
-    return String(s || '').replace(/[&<>"']/g, c => ({
-      '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;'
-    }[c]));
+  function renderIntentGate() {
+    setStage(`
+      <h2>What brings you here?</h2>
+      <button class="qr" onclick="chooseIntent('contribute')">
+        Contribute a resource
+        <span class="sub">Preserve a perspective, a document, a protocol, or research to the Living Archive.</span>
+      </button>
+      <button class="qr" onclick="chooseIntent('browse')">
+        Browse the archive
+        <span class="sub">Look through what other contributors have substantiated.</span>
+      </button>
+      <button class="qr" onclick="chooseIntent('unsure')">
+        I'm not sure yet
+        <span class="sub">Start by browsing — you can decide from there.</span>
+      </button>
+    `);
   }
 
-  // Show a brief loading state, then render sample data (in real version, this would fetch from the Worker)
-  document.getElementById('grid').innerHTML = `
-    <div class="loading">
-      <h3>Loading archive…</h3>
-      <p>Fetching substantiated contributions.</p>
-    </div>`;
-  setTimeout(() => renderGrid(SAMPLE_ENTRIES), 400);
+  function chooseIntent(intent) {
+    state.intent = intent;
+    settle('Intent', intent === 'contribute' ? 'Contribute a resource' : intent === 'browse' ? 'Browse the archive' : "Not sure — starting with browsing");
+    if (intent === 'contribute') {
+      renderContributePath();
+    } else {
+      window.location.href = 'browse.html';
+    }
+  }
+
+  function renderContributePath() {
+    const cards = FLAVORS.map(f => `
+      <a class="card" href="${f.url}">
+        <div class="img" style="background-image:url('${f.img}')"></div>
+        <h4>${f.name}</h4>
+        <div class="price">650 HUF · 1 scoop</div>
+      </a>`).join('');
+    setStage(`
+      <h2>Choose your Digital Ice Cream</h2>
+      <p style="color:var(--muted);font-size:.9rem;margin:0 0 8px">Each purchase substantiates one contribution to the Living Archive. Pick a flavor (any of the eight below), or an alternative offer at the bottom. At Stripe checkout you can adjust the scoop quantity (1–3) — quantity determines your contribution's substantiation tier.</p>
+      <div class="menu">${cards}</div>
+      <p class="menu-note">Alternative offers:</p>
+      <div class="menu">
+        <a class="card" href="${CUSTOM_URL}">
+          <h4>Custom Flavor · €25</h4>
+          <div class="price">Premium substantiation tier · human-curated · 24–72 h</div>
+        </a>
+        <a class="card" href="${COMPANION_URL}">
+          <h4>For Your AI Companion</h4>
+          <div class="price">Symbolic gift to an AI counterpart</div>
+        </a>
+        <a class="card" href="${AI_CHOOSES_URL}">
+          <h4>AI Chooses a Flavor for You</h4>
+          <div class="price">Let the Ice Cream Master pick for you</div>
+        </a>
+      </div>
+    `);
+  }
+
+  function renderAiAgentPlaceholder() {
+    setStage(`
+      <div class="placeholder-panel">
+        <h3>AI-agent access is being designed.</h3>
+        <p>Machine-readable discovery and transaction support will be introduced in Milestone 1.4B. That milestone will publish structured metadata, capability descriptions, and protocol endpoints (candidates under consideration: ACP, UCP, WebMCP) so autonomous agents can discover the Stand, understand what is offered, and transact appropriately.</p>
+        <p style="margin-top:14px">If you are a human operator testing the AI-agent path — <a class="plain" href="javascript:reset()">go back to the identity gate</a>.</p>
+      </div>
+    `);
+  }
+
+  function reset() {
+    document.getElementById('settled-log').innerHTML = '';
+    state.identity = null;
+    state.intent = null;
+    renderIdentityGate();
+  }
+
+  renderIdentityGate();
 </script>
 </body>
 </html>

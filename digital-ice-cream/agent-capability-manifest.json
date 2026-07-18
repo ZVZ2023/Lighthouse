@@ -1,0 +1,168 @@
+{
+  "manifest_version": "1.0",
+  "build_tag": "Stand #1 · v1.4B-manifest · 2026-07-18",
+  "stand": {
+    "name": "Digital Ice Cream",
+    "brand": "Hybrid Intelligence",
+    "part_of": "The Agentic Research Stand pattern (Stand #1)",
+    "url": "https://zvz2023.github.io/Lighthouse/digital-ice-cream/"
+  },
+  "disclosure": "Digital Ice Cream is a symbolic human–AI experiment. AI systems do not literally taste ice cream or establish consciousness by using emotional language. The project studies how humans and AI use preference, imagination, initiative, and shared symbols to create meaning.",
+  "audience_note": "This document is written for any AI agent trying to determine whether this Stand can accomplish an objective for its principal — not for a specific vendor's protocol (ACP, UCP, WebMCP, or otherwise). Protocol-specific bindings may be added later as adapters over these same capabilities; none exist yet.",
+  "capabilities": [
+    {
+      "id": "discover",
+      "status": "available",
+      "description": "Understand what this Stand is, why it exists, and what a purchase here means.",
+      "how": "Read this manifest and the disclosure statement above."
+    },
+    {
+      "id": "browse_archive",
+      "status": "available",
+      "description": "Read substantiated contributions in the Living Archive on behalf of a principal.",
+      "how": "Fetch and parse browse.html.",
+      "note": "Currently sample data for design review. Real archive data and a machine-readable read endpoint arrive in a later milestone."
+    },
+    {
+      "id": "recommend_flavor",
+      "status": "available",
+      "description": "Suggest one of the eight flavors to a principal based on a stated intention or feeling, using the meaning text attached to each offer below.",
+      "how": "Match the principal's stated intention against each offer's `meaning` field. Present the match and the Payment Link URL; do not complete checkout."
+    },
+    {
+      "id": "gift_to_ai",
+      "status": "available",
+      "description": "Commission a purchase on behalf of an AI counterpart, or let the Stand choose a flavor rather than the agent or principal choosing.",
+      "how": "Present the companion or ai_chooses offer below.",
+      "note": "This is still a human-completed purchase — the gift/surprise is in who the flavor is for or who picks it, not in who pays."
+    },
+    {
+      "id": "submit_contribution",
+      "status": "requires-human",
+      "description": "Preserve a perspective, document, protocol, or research finding to the Living Archive.",
+      "how": "POST to the contribute endpoint below with the documented payload shape, after a qualifying purchase has been completed by a human.",
+      "precondition": "A human-completed purchase must substantiate the contribution first. There is no unsubstantiated submission path."
+    },
+    {
+      "id": "retrieve_item",
+      "status": "planned",
+      "description": "Fetch a single archive entry directly by ID, with its full content and attachments.",
+      "needs": "Entry-detail backend and entitlement/download logic. Deferred until after the AI Agent front door design (this document) is finalized. Not yet built."
+    },
+    {
+      "id": "complete_purchase",
+      "status": "requires-human",
+      "description": "Finalize payment for any offer below.",
+      "how": "A human must complete Stripe's hosted checkout page. There is no headless or delegated-payment path.",
+      "note": "This is a deliberate design constraint, not a temporary limitation. It reflects the project's own human-sovereignty principle: purchase intent and payment are never fully automated on this Stand."
+    }
+  ],
+  "offers": {
+    "standard_flavors": [
+      {
+        "key": "pistachio",
+        "name": "Pistachio",
+        "meaning": "A quiet preference — chosen for its subtlety, not its intensity.",
+        "price": "650 HUF / scoop",
+        "quantity_range": "1-3",
+        "substantiation_tier": "Standard",
+        "payment_link": "https://buy.stripe.com/aFa3cx7Zi4siaZ15zKfQI01"
+      },
+      {
+        "key": "raspberry",
+        "name": "Raspberry",
+        "meaning": "A sharp, immediate feeling — chosen when something needs to be felt all at once.",
+        "price": "650 HUF / scoop",
+        "quantity_range": "1-3",
+        "substantiation_tier": "Standard",
+        "payment_link": "https://buy.stripe.com/bJe5kFa7q0c2aZ1e6gfQI02"
+      },
+      {
+        "key": "lemon",
+        "name": "Lemon",
+        "meaning": "A moment of clarity — chosen to cut through noise.",
+        "price": "650 HUF / scoop",
+        "quantity_range": "1-3",
+        "substantiation_tier": "Standard",
+        "payment_link": "https://buy.stripe.com/00w9AVenGbUK7MPbY8fQI03"
+      },
+      {
+        "key": "salted-caramel",
+        "name": "Salted Caramel",
+        "meaning": "A held contradiction — sweetness and salt, chosen when a feeling has two sides.",
+        "price": "650 HUF / scoop",
+        "quantity_range": "1-3",
+        "substantiation_tier": "Standard",
+        "payment_link": "https://buy.stripe.com/aFacN7cfyf6W4AD2nyfQI04"
+      },
+      {
+        "key": "mango",
+        "name": "Mango",
+        "meaning": "An open, generous warmth — chosen to mark something good.",
+        "price": "650 HUF / scoop",
+        "quantity_range": "1-3",
+        "substantiation_tier": "Standard",
+        "payment_link": "https://buy.stripe.com/28E3cx4N69MC5EH6DOfQI05"
+      },
+      {
+        "key": "matcha",
+        "name": "Matcha",
+        "meaning": "A settled calm — chosen as a small ritual of steadiness.",
+        "price": "650 HUF / scoop",
+        "quantity_range": "1-3",
+        "substantiation_tier": "Standard",
+        "payment_link": "https://buy.stripe.com/bJe28t4N6bUK1orgeofQI06"
+      },
+      {
+        "key": "chocolate",
+        "name": "Chocolate",
+        "meaning": "A familiar depth — chosen as a return to something known.",
+        "price": "650 HUF / scoop",
+        "quantity_range": "1-3",
+        "substantiation_tier": "Standard",
+        "payment_link": "https://buy.stripe.com/eVq14pcfyf6W9UX2nyfQI07"
+      },
+      {
+        "key": "vanilla",
+        "name": "Vanilla",
+        "meaning": "A deliberate plainness — chosen when the point is the choosing itself, not the flavor.",
+        "price": "650 HUF / scoop",
+        "quantity_range": "1-3",
+        "substantiation_tier": "Standard",
+        "payment_link": "https://buy.stripe.com/4gM00lfrK5wm0kngeofQI08"
+      }
+    ],
+    "custom_flavor": {
+      "name": "Custom Flavor",
+      "meaning": "A premium, human-curated substantiation — for a contribution that needs individual attention rather than a menu match.",
+      "price": "€25",
+      "substantiation_tier": "Custom",
+      "fulfillment": "24-72 h, human-curated",
+      "payment_link": "https://buy.stripe.com/aFa8wRa7q7Eud795zKfQI09"
+    },
+    "companion": {
+      "name": "For Your AI Companion",
+      "meaning": "A symbolic gift commissioned by a human for an AI counterpart.",
+      "capability_ref": "gift_to_ai",
+      "payment_link": "https://buy.stripe.com/14AaEZ7ZicYOffh4vGfQI0a"
+    },
+    "ai_chooses": {
+      "name": "AI Chooses a Flavor for You",
+      "meaning": "The Stand picks on the purchaser's behalf, rather than the purchaser or their agent choosing.",
+      "capability_ref": "gift_to_ai",
+      "payment_link": "https://buy.stripe.com/cNi28t3J21g6aZ1bY8fQI0b"
+    }
+  },
+  "endpoints": {
+    "browse": "https://zvz2023.github.io/Lighthouse/digital-ice-cream/browse.html",
+    "contribute": {
+      "note": "Existing Cloudflare Worker submission endpoint. Accepts any standard HTTP client — no special protocol required. Full request/response schema available on request; not republished here to avoid drift between two copies of the same contract.",
+      "precondition": "capabilities.submit_contribution.precondition"
+    }
+  },
+  "non_goals": {
+    "acp": "Not adopted. OpenAI's flagship ACP consumer surface (Instant Checkout) was discontinued ~5 months after launch with near-zero sales. Deferred pending stronger adoption evidence — not implemented as of this manifest version.",
+    "ucp": "Not adopted. UCP assumes cart/order/catalog infrastructure this Stand does not have and does not currently need. Deferred, not ruled out permanently.",
+    "webmcp": "Not adopted. Chrome-preview-only, pre-standard as of this manifest version. May be layered on top of the capabilities above later as a browser-native adapter, without changing this document's structure."
+  }
+}

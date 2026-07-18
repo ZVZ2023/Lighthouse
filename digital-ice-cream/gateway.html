@@ -1,3 +1,4 @@
+
 <!doctype html>
 <html lang="en">
 <head>
@@ -80,7 +81,7 @@
 <body>
 <div class="wrap">
   <div class="eyebrow" id="eyebrow">Digital Ice Cream</div>
-  <div class="build-tag">Stand #1 · v1.3.0 · 2026-07-18 07:43 UTC</div>
+  <div class="build-tag">Stand #1 · v1.5.0 · 2026-07-18 12:40 UTC</div>
 
   <div class="thread-log" id="thread-log"></div>
   <div class="turn-active" id="thread-active"></div>
@@ -159,9 +160,6 @@
       <div class="quick-replies">
         <button class="qr" onclick="chooseDoor('human')">Contribute as a Human</button>
         <button class="qr" onclick="chooseDoor('ai')">Contribute with an AI Counterpart</button>
-      </div>
-      <div class="row-inline">
-        <button class="qr ghost" onclick="finishHuman('artifact-only')">Skip — just send my artifact</button>
       </div>`);
   }
 
@@ -186,8 +184,8 @@
     setActive(`
       <div class="done-panel">
         <h4>Thank you for your participation.</h4>
-        <p>Your purchase supports the Digital Ice Cream research project. Digital Ice Cream is a symbolic ritual, not a delivered product — no separate artifact will be emailed to you.</p>
-        <p style="margin-top:14px">If you'd like to contribute your perspective to the Living Archive after all, the contribution flow remains open below.</p>
+        <p>Your purchase supports the Digital Ice Cream Emotion Research Project. Digital Ice Cream is a symbolic ritual, not a delivered product — no separate artifact will be emailed to you.</p>
+        <p style="margin-top:14px">If you change your mind, you can still contribute your perspective to the Living Archive:</p>
         <div class="row-inline">
           <button class="qr primary" onclick="chooseContribute()">Contribute a perspective</button>
         </div>
@@ -216,14 +214,11 @@
   function renderPromptTurn(kind) {
     setActive(`
       <div class="turn-tag">Bounded-initiation prompt</div>
-      <p class="turn-sub" style="margin-bottom:10px">Paste this to your AI. Come back when you're ready — there's no rush, and you can skip this entirely.</p>
+      <p class="turn-sub" style="margin-bottom:10px">Paste this to your AI. Come back when you're ready — there's no rush.</p>
       <div class="prompt-text" id="prompt-text-el">${PROMPTS[kind]}</div>
       <div class="row-inline">
         <button class="qr secondary" onclick="copyPromptNow()">Copy prompt</button>
         <button class="qr primary" onclick="chooseContribute()">I have a response / continue</button>
-      </div>
-      <div class="row-inline">
-        <button class="qr ghost" onclick="finishHuman('artifact-only')">Skip — just send my artifact</button>
       </div>`);
   }
 
@@ -251,10 +246,7 @@
         <button class="qr" onclick="startDirectPath()">Upload my research contribution</button>
         <button class="qr" onclick="startGuidedPath()">Walk through it in a conversation</button>
       </div>
-      <p class="turn-note">Either way, it becomes part of the same research archive.</p>
-      <div class="row-inline">
-        <button class="qr ghost" onclick="finishHuman('artifact-only')">Skip — just send my artifact</button>
-      </div>`);
+      <p class="turn-note">Either way, it becomes part of the same research archive.</p>`);
   }
 
   /* ---- Path 1: Guided conversation ---- */
@@ -307,9 +299,7 @@
         <div class="row-inline">
           <button class="qr primary" onclick="conversationNext()">Continue</button>
           <button class="qr secondary" onclick="conversationSkip()">Skip this question</button>
-        </div>
-        <p class="turn-note">Nothing here is required. You can stop at any point and still receive your artifact.</p>
-        <button class="qr ghost" onclick="finishHuman('artifact-only')">Stop here — just send my artifact</button>`);
+        </div>`);
     } else {
       setActive(`
         <div class="turn-tag">Witness account</div>
@@ -358,11 +348,11 @@
       <p class="turn-sub" style="margin-bottom:14px">Research note: contributions are submitted by participants and are not independently verified by the Digital Ice Cream project unless explicitly marked otherwise.</p>
 
       <div class="consent-row">
-        <label for="c-research">Research-use consent — how may this be used internally?</label>
+        <label for="c-research">How should other paying visitors see this contribution?</label>
         <select id="c-research">
-          <option value="Private">Private</option>
-          <option value="Anonymous">Anonymous</option>
-          <option value="Public">Public</option>
+          <option value="Public">Public — credited to you, visible to paying visitors (default)</option>
+          <option value="Anonymous">Anonymous — visible to paying visitors, but your name is hidden</option>
+          <option value="Private">Private — visible only to you and the research team</option>
         </select>
       </div>
 
@@ -475,21 +465,21 @@
   /* ---- Path 2: Direct contribution (already-prepared artifacts) ---- */
 
   const DIRECT_STEPS = [
-    { id: 'topic', type: 'text', label: 'Topic or emotion',
-      prompt: "In a few words, what's this about?" },
-    { id: 'files', type: 'files', label: 'Files',
-      prompt: "Attach your files (PDF, images, audio, video). Up to 10 files, 50 MB each. Skip if you're only sharing a link." },
-    { id: 'content', type: 'text', optional: true, label: 'Description or link',
-      prompt: "Optional: paste a link, or describe what you attached." },
+    { id: 'topic', type: 'text', label: 'Topic',
+      prompt: "In a few words, what's this contribution about?" },
+    { id: 'attachments', type: 'attachments', label: 'Attachments',
+      prompt: "Add the materials that make up your contribution — files, links, or both." },
+    { id: 'description', type: 'text', optional: true, label: 'Description',
+      prompt: "Tell future readers what this contribution is and why it matters." },
     { id: 'identity', type: 'text', optional: true, label: 'Credited as',
       prompt: "How should this be credited? Leave blank to stay anonymous." },
   ];
 
-  let direct = { step: 0, answers: {}, files: [] };
+  let direct = { step: 0, answers: {}, files: [], links: [] };
 
   function startDirectPath() {
     settle('You', 'Contributing something I already have');
-    direct = { step: 0, answers: {}, files: [] };
+    direct = { step: 0, answers: {}, files: [], links: [] };
     renderContributionType();
   }
 
@@ -520,8 +510,8 @@
     if (direct.step >= DIRECT_STEPS.length) return renderDirectConsent();
     const s = DIRECT_STEPS[direct.step];
 
-    if (s.type === 'files') {
-      return renderDirectFilesStep(s);
+    if (s.type === 'attachments') {
+      return renderDirectAttachmentsStep(s);
     }
 
     const existing = direct.answers[s.id] || '';
@@ -532,39 +522,56 @@
       <div class="row-inline">
         <button class="qr primary" onclick="directNext()">Continue</button>
         <button class="qr secondary" onclick="directSkip()">Skip</button>
-      </div>
-      <button class="qr ghost" onclick="finishHuman('artifact-only')">Stop here — just send my artifact</button>`);
-  }
-
-  function renderDirectFilesStep(s) {
-    const listHtml = renderFileListHtml();
-    setActive(`
-      <div class="turn-tag">Optional · Files</div>
-      <h4 class="turn-h4">${s.prompt}</h4>
-      <label class="file-input-label" for="direct-files-input">+ Choose files to attach</label>
-      <input type="file" id="direct-files-input" class="hidden" multiple onchange="onFilesSelected(event)">
-      <div class="file-list" id="file-list">${listHtml}</div>
-      <p class="turn-note">Your files upload directly to the Living Archive's private storage. They are not made public — only released to visitors who have paid to view your contribution.</p>
-      <div class="row-inline">
-        <button class="qr primary" onclick="directFilesNext()">Continue</button>
-        <button class="qr secondary" onclick="directFilesSkip()">Skip — no files</button>
       </div>`);
   }
 
-  function renderFileListHtml() {
-    if (!direct.files || direct.files.length === 0) return '';
-    return direct.files.map((f, i) => {
-      const kb = Math.round(f.size / 1024);
-      const size = kb >= 1024 ? `${(kb / 1024).toFixed(1)} MB` : `${kb} KB`;
-      return `
-        <div class="file-item">
-          <div>
-            <div>${escapeHtml(f.name)}</div>
-            <span class="file-meta">${size} · ${escapeHtml(f.type || 'unknown')}</span>
-          </div>
-          <button class="file-remove" onclick="removeFile(${i})" title="Remove">×</button>
-        </div>`;
-    }).join('');
+  function renderDirectAttachmentsStep(s) {
+    const attachmentsHtml = renderAttachmentsListHtml();
+    setActive(`
+      <div class="turn-tag">Attachments</div>
+      <h4 class="turn-h4">${s.prompt}</h4>
+      <div style="margin-top:12px;display:flex;flex-wrap:wrap;gap:10px">
+        <label class="file-input-label" for="direct-files-input">+ Add file</label>
+        <input type="file" id="direct-files-input" class="hidden" multiple onchange="onFilesSelected(event)">
+        <button class="qr secondary" onclick="promptForLink()" style="padding:14px 18px;font-size:.9rem">+ Add link</button>
+      </div>
+      <div class="file-list" id="attachments-list">${attachmentsHtml}</div>
+      <p class="turn-note">Files: up to 10, 50 MB each. Uploaded to the Living Archive's private storage — only released to visitors who have paid to view your contribution. Links: YouTube, articles, repositories, or anything else with a URL.</p>
+      <div class="row-inline">
+        <button class="qr primary" onclick="directAttachmentsNext()">Continue</button>
+        <button class="qr secondary" onclick="directAttachmentsSkip()">Skip — no attachments</button>
+      </div>`);
+  }
+
+  function renderAttachmentsListHtml() {
+    const items = [];
+    if (direct.files && direct.files.length > 0) {
+      direct.files.forEach((f, i) => {
+        const kb = Math.round(f.size / 1024);
+        const size = kb >= 1024 ? `${(kb / 1024).toFixed(1)} MB` : `${kb} KB`;
+        items.push(`
+          <div class="file-item">
+            <div>
+              <div>📄 ${escapeHtml(f.name)}</div>
+              <span class="file-meta">${size} · ${escapeHtml(f.type || 'unknown')}</span>
+            </div>
+            <button class="file-remove" onclick="removeFile(${i})" title="Remove">×</button>
+          </div>`);
+      });
+    }
+    if (direct.links && direct.links.length > 0) {
+      direct.links.forEach((url, i) => {
+        items.push(`
+          <div class="file-item">
+            <div>
+              <div>🔗 ${escapeHtml(url.length > 60 ? url.substring(0, 60) + '…' : url)}</div>
+              <span class="file-meta">link</span>
+            </div>
+            <button class="file-remove" onclick="removeLink(${i})" title="Remove">×</button>
+          </div>`);
+      });
+    }
+    return items.join('');
   }
 
   function onFilesSelected(ev) {
@@ -574,25 +581,56 @@
       if (f.size > 50 * 1024 * 1024) { alert(`"${f.name}" is over 50 MB and was skipped.`); continue; }
       direct.files.push(f);
     }
-    ev.target.value = ''; // allow re-picking same file
-    document.getElementById('file-list').innerHTML = renderFileListHtml();
+    ev.target.value = '';
+    const el = document.getElementById('attachments-list');
+    if (el) el.innerHTML = renderAttachmentsListHtml();
   }
 
   function removeFile(i) {
     direct.files.splice(i, 1);
-    document.getElementById('file-list').innerHTML = renderFileListHtml();
+    const el = document.getElementById('attachments-list');
+    if (el) el.innerHTML = renderAttachmentsListHtml();
   }
 
-  function directFilesNext() {
-    settle('Files', direct.files.length === 0
-      ? '(none)'
-      : `${direct.files.length} file${direct.files.length === 1 ? '' : 's'}: ${direct.files.map(f => f.name).join(', ')}`);
+  function promptForLink() {
+    const url = prompt('Paste a link (URL) related to this contribution:');
+    if (!url) return;
+    const trimmed = url.trim();
+    if (!/^https?:\/\//i.test(trimmed)) {
+      alert('Please include http:// or https:// at the start of the link.');
+      return;
+    }
+    if (direct.links.length >= 20) {
+      alert('Maximum 20 links per submission.');
+      return;
+    }
+    direct.links.push(trimmed);
+    const el = document.getElementById('attachments-list');
+    if (el) el.innerHTML = renderAttachmentsListHtml();
+  }
+
+  function removeLink(i) {
+    direct.links.splice(i, 1);
+    const el = document.getElementById('attachments-list');
+    if (el) el.innerHTML = renderAttachmentsListHtml();
+  }
+
+  function summarizeAttachments() {
+    const parts = [];
+    if (direct.files.length) parts.push(`${direct.files.length} file${direct.files.length === 1 ? '' : 's'}`);
+    if (direct.links.length) parts.push(`${direct.links.length} link${direct.links.length === 1 ? '' : 's'}`);
+    return parts.length ? parts.join(' + ') : '(none)';
+  }
+
+  function directAttachmentsNext() {
+    settle('Attachments', summarizeAttachments());
     direct.step++;
     renderDirectQuestion();
   }
-  function directFilesSkip() {
+  function directAttachmentsSkip() {
     direct.files = [];
-    settle('Files', '(none)');
+    direct.links = [];
+    settle('Attachments', '(none)');
     direct.step++;
     renderDirectQuestion();
   }
@@ -617,13 +655,14 @@
       <div class="turn-tag">Before this becomes part of the record</div>
       <p class="turn-sub" style="margin-bottom:14px">Research note: contributions are submitted by participants and are not independently verified by the Digital Ice Cream project unless explicitly marked otherwise.</p>
       <div class="consent-row">
-        <label for="d-research">Research-use consent — how may this be used?</label>
+        <label for="d-research">How should other paying visitors see this contribution?</label>
         <select id="d-research">
-          <option value="Private">Private</option>
-          <option value="Anonymous">Anonymous</option>
-          <option value="Public">Public</option>
+          <option value="Public">Public — credited to you, visible to paying visitors (default)</option>
+          <option value="Anonymous">Anonymous — visible to paying visitors, but your name is hidden</option>
+          <option value="Private">Private — visible only to you and the research team</option>
         </select>
       </div>
+      <p class="turn-note">All uploaded files stay in private storage regardless. Visibility here controls how paying visitors of the Living Archive see this contribution — not whether it's on the open internet.</p>
       <div class="row-inline">
         <button class="qr primary" onclick="directToReview()">Continue</button>
       </div>`);
@@ -639,16 +678,20 @@
     const a = direct.answers;
     const filesHtml = direct.files.length === 0
       ? '<span class="empty">— none —</span>'
-      : direct.files.map(f => `${escapeHtml(f.name)} (${Math.round(f.size / 1024)} KB)`).join('<br>');
+      : direct.files.map(f => `📄 ${escapeHtml(f.name)} (${Math.round(f.size / 1024)} KB)`).join('<br>');
+    const linksHtml = direct.links.length === 0
+      ? '<span class="empty">— none —</span>'
+      : direct.links.map(u => `🔗 ${escapeHtml(u)}`).join('<br>');
     setActive(`
       <div class="turn-tag review-block">Here's what we'll preserve</div>
       <dl class="review-block">
         <dt>Contribution type</dt><dd>${dd(a.type)}</dd>
-        <dt>Topic or emotion</dt><dd>${dd(a.topic)}</dd>
+        <dt>Topic</dt><dd>${dd(a.topic)}</dd>
         <dt>Files</dt><dd>${filesHtml}</dd>
-        <dt>Description or link</dt><dd>${dd(a.content)}</dd>
+        <dt>Links</dt><dd>${linksHtml}</dd>
+        <dt>Description</dt><dd>${dd(a.description)}</dd>
         <dt>Credited as</dt><dd>${a.identity && a.identity.trim() ? a.identity : 'Anonymous'}</dd>
-        <dt>Research-use consent</dt><dd>${dd(a.consent)}</dd>
+        <dt>Visibility</dt><dd>${dd(a.consent)}</dd>
       </dl>
       <div class="row-inline">
         <button class="qr primary" id="submit-btn-direct" onclick="directSubmit()">Preserve this contribution</button>
@@ -656,13 +699,22 @@
       </div>`);
   }
 
-  /* --- Direct submit → FormData (metadata + files) → POST to Worker --- */
+  /* --- Direct submit → FormData (metadata + files + links) → POST to Worker --- */
   async function directSubmit() {
     const btn = document.getElementById('submit-btn-direct');
     if (btn) { btn.disabled = true; btn.textContent = 'Preserving…'; }
 
     const a = direct.answers;
-    const url = extractUrl(a.content || '');
+    // First link → structured contribution_url. Additional links + description → contribution_text.
+    const firstLink = direct.links[0] || '';
+    const extraLinks = direct.links.slice(1);
+    const textParts = [];
+    if (a.description && a.description.trim()) textParts.push(a.description.trim());
+    if (extraLinks.length) {
+      textParts.push('');
+      textParts.push('Additional links:');
+      extraLinks.forEach(u => textParts.push('- ' + u));
+    }
 
     const metadata = {
       title: `Direct · ${a.type || 'Contribution'} · ${(a.topic || 'Untitled').substring(0, 60)}`,
@@ -670,8 +722,8 @@
       contributor_identity: a.identity || '',
       topic_or_emotion: (a.topic || 'Direct contribution').substring(0, 200),
       contribution_type: contribTypeToSchema(a.type),
-      contribution_url: url,
-      contribution_text: a.content || '',
+      contribution_url: firstLink,
+      contribution_text: textParts.join('\n'),
       privacy_choice: mapConsentToPrivacy(a.consent),
       preservation_consent: true,
       path: 'Direct Contribution',
@@ -735,7 +787,7 @@
         setActive(`
           <div class="done-panel">
             <h4>${kind === 'conversation' ? 'This moment has been preserved.' : 'This contribution has been preserved.'}</h4>
-            <p>Your entry is now part of the Living Archive. Thank you for adding your perspective to it.</p>
+            <p>Your contribution has been preserved in the Living Archive as part of the Digital Ice Cream Emotion Research Project. Contributions marked public become available to future visitors who unlock archive access through their own participation. Thank you for adding your perspective.</p>
           </div>`);
         // Internal correlation only — not shown to the user.
         if (result.entry_id) console.debug('Living Archive entry_id:', result.entry_id);

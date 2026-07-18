@@ -1,0 +1,10 @@
+User-agent: *
+Allow: /
+
+# This is a deliberate, explicit "allow all" policy for zvz2023.github.io,
+# stated on purpose rather than left to the default of no robots.txt.
+# No crawler or AI agent is restricted from any page on this site.
+
+# Machine-readable resources for AI agents (Digital Ice Cream, Stand #1):
+# https://zvz2023.github.io/Lighthouse/digital-ice-cream/llms.txt
+# https://zvz2023.github.io/Lighthouse/digital-ice-cream/agent-capability-manifest.json

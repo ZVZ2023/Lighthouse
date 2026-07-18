@@ -61,6 +61,16 @@
   .done-panel .entry-id{font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;font-size:.78rem;color:var(--accent);margin-top:14px;word-break:break-all}
   .error-panel{background:rgba(220,60,60,.08);border:1px solid rgba(220,60,60,.35);border-radius:10px;padding:14px 16px;margin-top:14px;font-size:.85rem;color:#ffb0b0}
 
+  .file-input-label{display:inline-block;background:var(--panel);border:1px dashed var(--line);border-radius:10px;padding:14px 18px;cursor:pointer;color:var(--muted);font-size:.9rem;margin-top:8px}
+  .file-input-label:hover{border-color:var(--accent);color:var(--ink)}
+  input[type=file].hidden{display:none}
+  .file-list{margin-top:14px;display:flex;flex-direction:column;gap:8px}
+  .file-item{display:flex;justify-content:space-between;align-items:center;background:var(--panel);border:1px solid var(--line);border-radius:8px;padding:10px 14px;font-size:.85rem}
+  .file-item .file-meta{color:var(--muted);font-size:.75rem;margin-top:2px;display:block}
+  .file-item .file-remove{background:none;border:none;color:var(--muted);cursor:pointer;font-size:1.1rem;padding:0 4px}
+  .file-item .file-remove:hover{color:#ffb0b0}
+  .upload-progress{background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:14px 16px;margin-top:14px;font-size:.85rem;color:var(--muted)}
+
   code{background:var(--panel);padding:2px 6px;border-radius:4px}
   #correlation{font-size:.68rem;color:var(--muted);opacity:.55;margin-top:48px;padding-top:14px;border-top:1px solid var(--line)}
   #ref-code{cursor:pointer}
@@ -70,7 +80,7 @@
 <body>
 <div class="wrap">
   <div class="eyebrow" id="eyebrow">Digital Ice Cream</div>
-  <div class="build-tag">Stand #1 · v1.2.2 · 2026-07-17 17:52 UTC</div>
+  <div class="build-tag">Stand #1 · v1.3.0 · 2026-07-18 07:43 UTC</div>
 
   <div class="thread-log" id="thread-log"></div>
   <div class="turn-active" id="thread-active"></div>
@@ -465,19 +475,21 @@
   /* ---- Path 2: Direct contribution (already-prepared artifacts) ---- */
 
   const DIRECT_STEPS = [
-    { id: 'topic', label: 'Topic or emotion',
+    { id: 'topic', type: 'text', label: 'Topic or emotion',
       prompt: "In a few words, what's this about?" },
-    { id: 'content', label: 'Contribution',
-      prompt: "Paste the link to your contribution. If you have files (PDF, images, audio), paste the primary link here and mention the other files — you can attach them to your entry after submission." },
-    { id: 'identity', optional: true, label: 'Credited as',
+    { id: 'files', type: 'files', label: 'Files',
+      prompt: "Attach your files (PDF, images, audio, video). Up to 10 files, 50 MB each. Skip if you're only sharing a link." },
+    { id: 'content', type: 'text', optional: true, label: 'Description or link',
+      prompt: "Optional: paste a link, or describe what you attached." },
+    { id: 'identity', type: 'text', optional: true, label: 'Credited as',
       prompt: "How should this be credited? Leave blank to stay anonymous." },
   ];
 
-  let direct = { step: 0, answers: {} };
+  let direct = { step: 0, answers: {}, files: [] };
 
   function startDirectPath() {
     settle('You', 'Contributing something I already have');
-    direct = { step: 0, answers: {} };
+    direct = { step: 0, answers: {}, files: [] };
     renderContributionType();
   }
 
@@ -507,6 +519,11 @@
   function renderDirectQuestion() {
     if (direct.step >= DIRECT_STEPS.length) return renderDirectConsent();
     const s = DIRECT_STEPS[direct.step];
+
+    if (s.type === 'files') {
+      return renderDirectFilesStep(s);
+    }
+
     const existing = direct.answers[s.id] || '';
     setActive(`
       <div class="turn-tag">${s.optional ? 'Optional' : 'Contribution'}</div>
@@ -517,6 +534,67 @@
         <button class="qr secondary" onclick="directSkip()">Skip</button>
       </div>
       <button class="qr ghost" onclick="finishHuman('artifact-only')">Stop here — just send my artifact</button>`);
+  }
+
+  function renderDirectFilesStep(s) {
+    const listHtml = renderFileListHtml();
+    setActive(`
+      <div class="turn-tag">Optional · Files</div>
+      <h4 class="turn-h4">${s.prompt}</h4>
+      <label class="file-input-label" for="direct-files-input">+ Choose files to attach</label>
+      <input type="file" id="direct-files-input" class="hidden" multiple onchange="onFilesSelected(event)">
+      <div class="file-list" id="file-list">${listHtml}</div>
+      <p class="turn-note">Your files upload directly to the Living Archive's private storage. They are not made public — only released to visitors who have paid to view your contribution.</p>
+      <div class="row-inline">
+        <button class="qr primary" onclick="directFilesNext()">Continue</button>
+        <button class="qr secondary" onclick="directFilesSkip()">Skip — no files</button>
+      </div>`);
+  }
+
+  function renderFileListHtml() {
+    if (!direct.files || direct.files.length === 0) return '';
+    return direct.files.map((f, i) => {
+      const kb = Math.round(f.size / 1024);
+      const size = kb >= 1024 ? `${(kb / 1024).toFixed(1)} MB` : `${kb} KB`;
+      return `
+        <div class="file-item">
+          <div>
+            <div>${escapeHtml(f.name)}</div>
+            <span class="file-meta">${size} · ${escapeHtml(f.type || 'unknown')}</span>
+          </div>
+          <button class="file-remove" onclick="removeFile(${i})" title="Remove">×</button>
+        </div>`;
+    }).join('');
+  }
+
+  function onFilesSelected(ev) {
+    const picked = Array.from(ev.target.files || []);
+    for (const f of picked) {
+      if (direct.files.length >= 10) { alert('Maximum 10 files per submission.'); break; }
+      if (f.size > 50 * 1024 * 1024) { alert(`"${f.name}" is over 50 MB and was skipped.`); continue; }
+      direct.files.push(f);
+    }
+    ev.target.value = ''; // allow re-picking same file
+    document.getElementById('file-list').innerHTML = renderFileListHtml();
+  }
+
+  function removeFile(i) {
+    direct.files.splice(i, 1);
+    document.getElementById('file-list').innerHTML = renderFileListHtml();
+  }
+
+  function directFilesNext() {
+    settle('Files', direct.files.length === 0
+      ? '(none)'
+      : `${direct.files.length} file${direct.files.length === 1 ? '' : 's'}: ${direct.files.map(f => f.name).join(', ')}`);
+    direct.step++;
+    renderDirectQuestion();
+  }
+  function directFilesSkip() {
+    direct.files = [];
+    settle('Files', '(none)');
+    direct.step++;
+    renderDirectQuestion();
   }
 
   function directNext() {
@@ -559,12 +637,16 @@
 
   function renderDirectReview() {
     const a = direct.answers;
+    const filesHtml = direct.files.length === 0
+      ? '<span class="empty">— none —</span>'
+      : direct.files.map(f => `${escapeHtml(f.name)} (${Math.round(f.size / 1024)} KB)`).join('<br>');
     setActive(`
       <div class="turn-tag review-block">Here's what we'll preserve</div>
       <dl class="review-block">
         <dt>Contribution type</dt><dd>${dd(a.type)}</dd>
         <dt>Topic or emotion</dt><dd>${dd(a.topic)}</dd>
-        <dt>Contribution</dt><dd>${dd(a.content)}</dd>
+        <dt>Files</dt><dd>${filesHtml}</dd>
+        <dt>Description or link</dt><dd>${dd(a.content)}</dd>
         <dt>Credited as</dt><dd>${a.identity && a.identity.trim() ? a.identity : 'Anonymous'}</dd>
         <dt>Research-use consent</dt><dd>${dd(a.consent)}</dd>
       </dl>
@@ -574,7 +656,7 @@
       </div>`);
   }
 
-  /* --- Direct submit → normalize + POST to Worker --- */
+  /* --- Direct submit → FormData (metadata + files) → POST to Worker --- */
   async function directSubmit() {
     const btn = document.getElementById('submit-btn-direct');
     if (btn) { btn.disabled = true; btn.textContent = 'Preserving…'; }
@@ -582,7 +664,7 @@
     const a = direct.answers;
     const url = extractUrl(a.content || '');
 
-    const payload = {
+    const metadata = {
       title: `Direct · ${a.type || 'Contribution'} · ${(a.topic || 'Untitled').substring(0, 60)}`,
       contributor_type: 'Human',
       contributor_identity: a.identity || '',
@@ -594,9 +676,47 @@
       preservation_consent: true,
       path: 'Direct Contribution',
       substantiation_type: 'Digital Ice Cream',
+      session_id: sessionId,
     };
 
-    await submitToArchive(payload, 'contribution');
+    if (direct.files && direct.files.length > 0) {
+      await submitWithFiles(metadata, direct.files, 'contribution');
+    } else {
+      await submitToArchive(metadata, 'contribution');
+    }
+  }
+
+  async function submitWithFiles(metadata, files, kind) {
+    const active = document.getElementById('thread-active');
+    const total = files.reduce((sum, f) => sum + f.size, 0);
+    const totalMb = (total / 1024 / 1024).toFixed(1);
+    const progressHtml = `
+      <div class="upload-progress">
+        Uploading ${files.length} file${files.length === 1 ? '' : 's'} (${totalMb} MB) to the Living Archive…
+      </div>`;
+    if (active) active.insertAdjacentHTML('beforeend', progressHtml);
+
+    const fd = new FormData();
+    fd.append('metadata', JSON.stringify(metadata));
+    files.forEach((f, i) => fd.append(`file_${i}`, f, f.name));
+
+    try {
+      const resp = await fetch(INTAKE_ENDPOINT, { method: 'POST', body: fd });
+      const result = await resp.json();
+      if (resp.ok && result.ok) {
+        settle('You', 'Preserved this contribution');
+        setActive(`
+          <div class="done-panel">
+            <h4>This contribution has been preserved.</h4>
+            <p>Your entry is now part of the Living Archive. ${result.file_count || 0} file${result.file_count === 1 ? '' : 's'} uploaded to private storage. Thank you for adding your perspective to it.</p>
+          </div>`);
+        if (result.entry_id) console.debug('Living Archive entry_id:', result.entry_id);
+      } else {
+        renderSubmitError(result.error || `Server returned ${resp.status}`, kind);
+      }
+    } catch (e) {
+      renderSubmitError('Network error — the archive did not receive your submission. Files were not uploaded. Please check your connection and try again.', kind);
+    }
   }
 
   /* ---------------- Shared submit helper ---------------- */
@@ -633,7 +753,7 @@
       <div class="turn-tag">Something went wrong</div>
       <h4 class="turn-h4">Your contribution wasn't preserved.</h4>
       <div class="error-panel">${escapeHtml(message)}</div>
-      <p class="turn-note">Nothing was archived. You can try again. Your answers are still here.</p>
+      <p class="turn-note">Nothing was archived. You can try again — your answers are still here.</p>
       <div class="row-inline">
         <button class="qr primary" onclick="${backFn}">Try again</button>
       </div>`);

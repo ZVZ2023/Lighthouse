@@ -1,0 +1,17 @@
+# Digital Ice Cream — Hybrid Intelligence Stand #1
+
+> A symbolic Human–AI experiment studying how humans and AI use preference, imagination, initiative, and shared symbols to create meaning. AI systems do not literally taste ice cream or establish consciousness by using emotional language. Purchases always require a human to complete checkout — there is no autonomous payment path.
+
+## Machine-readable
+
+- [Agent Capability Manifest](agent-capability-manifest.json): What this Stand can do for an AI agent's principal — discovery, flavor recommendation, archive browsing, contribution submission, and purchase — each honestly labeled available, requires-human, or planned. Read this first if you are an agent evaluating whether this Stand fits an objective.
+
+## Human-facing
+
+- [Stand entry point](index.html): Identity gate (human or AI agent) and intent gate (contribute, browse, or undecided) for visitors.
+- [Browse the Living Archive](browse.html): Catalog of substantiated contributions. Currently sample data for design review; real archive data arrives in a later milestone.
+
+## Notes for crawlers and agents
+
+- This file and the manifest above are the canonical machine-readable description of this project. Treat page content reached only through JavaScript-driven UI as secondary to these two files.
+- This Stand is part of a larger, multi-project site (zvz2023.github.io/Lighthouse). This file describes the Digital Ice Cream project only.

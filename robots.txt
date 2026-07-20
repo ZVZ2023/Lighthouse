@@ -5,6 +5,8 @@ Allow: /
 # stated on purpose rather than left to the default of no robots.txt.
 # No crawler or AI agent is restricted from any page on this site.
 
+Sitemap: https://zvz2023.github.io/Lighthouse/sitemap.xml
+
 # Machine-readable resources for AI agents (Digital Ice Cream, Stand #1):
 # https://zvz2023.github.io/Lighthouse/digital-ice-cream/llms.txt
 # https://zvz2023.github.io/Lighthouse/digital-ice-cream/agent-capability-manifest.json

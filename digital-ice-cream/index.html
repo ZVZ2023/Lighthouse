@@ -90,6 +90,14 @@
     </ul>
   </div>
 
+  <div style="margin:0 0 28px">
+    <div class="video-frame" id="intro-video-slot"></div>
+    <div class="explain">
+      <p>This short video explains what Digital Ice Cream is, how the Living Archive works, and why looking through it starts with a small purchase rather than a free browse.</p>
+      <p>That's a deliberate choice, not a barrier for its own sake: a real (if small) commitment is what separates genuine participation from passing curiosity, and it's what keeps this experiment legible as research rather than a public feed. One scoop — 650 HUF — is the smallest unit of that commitment.</p>
+    </div>
+  </div>
+
   <p style="color:var(--muted);font-size:.78rem;margin:-14px 0 20px">Machine-readable: <a class="plain" href="agent-capability-manifest.json">Agent Capability Manifest</a> — no JavaScript required to find this link.</p>
 
   <div id="settled-log"></div>
@@ -185,13 +193,10 @@
   function chooseIntent(intent) {
     state.intent = intent;
     settle('Intent', intent === 'contribute' ? 'Contribute a resource' : intent === 'browse' ? 'Looking around' : "Not sure yet");
-    if (intent === 'contribute') {
-      renderContributePath();
-    } else {
-      // Look around / Not sure — intro video + explanation, not a direct
-      // link to the archive. Participation (one scoop) comes first.
-      renderLookAroundStage();
-    }
+    // The intro video + explanation now render immediately, above the
+    // identity gate, before any decision is made — so every intent
+    // (contribute, browse, unsure) leads straight to the flavor menu.
+    renderContributePath();
   }
 
   /* -------- Stage 3a: Contribute path (flavor menu) -------- */
@@ -224,30 +229,6 @@
     `);
   }
 
-  /* -------- Stage 3b: Look-around (video + explanation, human path) -------- */
-  function renderLookAroundStage() {
-    const videoHtml = INTRO_VIDEO_ID
-      ? `<iframe src="https://www.youtube.com/embed/${INTRO_VIDEO_ID}" title="Digital Ice Cream — introduction" allowfullscreen></iframe>`
-      : `<div class="video-placeholder">
-           <div class="icon">▶</div>
-           <div class="label">Introduction video coming soon.</div>
-         </div>`;
-
-    setStage(`
-      <h2>Before you look around</h2>
-      <div class="video-frame">${videoHtml}</div>
-      <div class="explain">
-        <p>This short video explains what Digital Ice Cream is, how the Living Archive works, and why looking through it starts with a small purchase rather than a free browse.</p>
-        <p>That's a deliberate choice, not a barrier for its own sake: a real (if small) commitment is what separates genuine participation from passing curiosity, and it's what keeps this experiment legible as research rather than a public feed. One scoop — 650 HUF — is the smallest unit of that commitment.</p>
-        <p class="muted">Once you've had a scoop, the archive opens.</p>
-      </div>
-      <div class="cta-row">
-        <button class="cta" onclick="renderContributePath()">Get your first scoop →</button>
-      </div>
-      <p style="margin-top:16px"><a class="plain" href="javascript:reset()">← Back to the identity gate</a></p>
-    `);
-  }
-
   /* -------- Stage 3c: AI Agent path -------- */
   function renderAiAgentPlaceholder() {
     setStage(`
@@ -266,6 +247,18 @@
     renderIdentityGate();
   }
 
+  function renderIntroVideoSlot() {
+    const slot = document.getElementById('intro-video-slot');
+    if (!slot) return;
+    slot.innerHTML = INTRO_VIDEO_ID
+      ? `<iframe src="https://www.youtube.com/embed/${INTRO_VIDEO_ID}" title="Digital Ice Cream — introduction" allowfullscreen></iframe>`
+      : `<div class="video-placeholder">
+           <div class="icon">▶</div>
+           <div class="label">Introduction video coming soon.</div>
+         </div>`;
+  }
+
+  renderIntroVideoSlot();
   renderIdentityGate();
 </script>
 </body>

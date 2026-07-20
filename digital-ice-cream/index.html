@@ -29,6 +29,7 @@
 
   .settled{color:var(--muted);font-size:.85rem;padding:8px 2px;border-left:2px solid var(--accent);padding-left:10px;margin-bottom:12px}
 
+  /* Contribute stage: flavor menu */
   .menu{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:14px;margin-top:20px}
   .card{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:14px;text-decoration:none;color:var(--ink);transition:border-color .15s;display:flex;flex-direction:column}
   .card:hover{border-color:var(--accent)}
@@ -43,13 +44,25 @@
 
   a.plain{color:var(--accent);text-decoration:none;border-bottom:1px solid rgba(201,164,255,.35)}
   a.plain:hover{border-bottom-color:var(--accent)}
+
+  /* Look-around stage: intro video + explanation */
+  .video-frame{position:relative;width:100%;aspect-ratio:16/9;background:var(--panel);border:1px solid var(--line);border-radius:12px;overflow:hidden;margin-bottom:18px}
+  .video-frame iframe{position:absolute;inset:0;width:100%;height:100%;border:0}
+  .video-placeholder{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;color:var(--muted);text-align:center;padding:20px}
+  .video-placeholder .icon{font-size:2rem;opacity:.5}
+  .video-placeholder .label{font-size:.85rem}
+
+  .explain p{color:var(--ink);font-size:.92rem;line-height:1.6;margin:0 0 14px}
+  .explain p.muted{color:var(--muted);font-size:.85rem}
+  .cta-row{margin-top:20px}
+  .cta{display:inline-block;background:var(--accent);color:#15131c;border:none;border-radius:10px;padding:12px 22px;font-family:inherit;font-size:.95rem;font-weight:600;cursor:pointer;text-decoration:none}
+  .cta:hover{opacity:.92}
 </style>
-<link rel="alternate" type="application/json" href="agent-capability-manifest.json" title="Agent Capability Manifest">
 </head>
 <body>
 <div class="wrap">
   <div class="eyebrow">Hybrid Intelligence · Field Experiment</div>
-  <div class="build-tag">Stand #1 · v1.4B.1 (discoverability fix) · 2026-07-18</div>
+  <div class="build-tag">Stand #1 · v1.5 · 2026-07-18</div>
   <h1>Digital Ice Cream</h1>
   <p class="lead">A symbolic Human–AI ritual studying how meaning is co-created. Each substantiated contribution becomes part of a Living Archive.</p>
 
@@ -63,6 +76,11 @@
 
 <script>
   const state = { identity: null, intent: null };
+
+  // Fill in the YouTube video ID (the part after "v=" or after "youtu.be/")
+  // when it's ready. Until then, the look-around stage shows a graceful
+  // "video coming soon" placeholder — no other code changes needed.
+  const INTRO_VIDEO_ID = '';
 
   const FLAVORS = [
     { key: 'pistachio',      name: 'Pistachio',       img: 'images/pistachio-3scoop.jpg',      url: 'https://buy.stripe.com/aFa3cx7Zi4siaZ15zKfQI01' },
@@ -98,6 +116,7 @@
     }, 180);
   }
 
+  /* -------- Stage 1: Identity gate -------- */
   function renderIdentityGate() {
     setStage(`
       <h2>Who's arriving at the Stand?</h2>
@@ -122,6 +141,7 @@
     }
   }
 
+  /* -------- Stage 2: Intent gate (Human only) -------- */
   function renderIntentGate() {
     setStage(`
       <h2>What brings you here?</h2>
@@ -130,26 +150,29 @@
         <span class="sub">Preserve a perspective, a document, a protocol, or research to the Living Archive.</span>
       </button>
       <button class="qr" onclick="chooseIntent('browse')">
-        Browse the archive
-        <span class="sub">Look through what other contributors have substantiated.</span>
+        I'm here to look around
+        <span class="sub">A short introduction first — the archive itself opens after your first scoop.</span>
       </button>
       <button class="qr" onclick="chooseIntent('unsure')">
         I'm not sure yet
-        <span class="sub">Start by browsing — you can decide from there.</span>
+        <span class="sub">Same introduction — you can decide once you've seen it.</span>
       </button>
     `);
   }
 
   function chooseIntent(intent) {
     state.intent = intent;
-    settle('Intent', intent === 'contribute' ? 'Contribute a resource' : intent === 'browse' ? 'Browse the archive' : "Not sure — starting with browsing");
+    settle('Intent', intent === 'contribute' ? 'Contribute a resource' : intent === 'browse' ? 'Looking around' : "Not sure yet");
     if (intent === 'contribute') {
       renderContributePath();
     } else {
-      window.location.href = 'browse.html';
+      // Look around / Not sure — intro video + explanation, not a direct
+      // link to the archive. Participation (one scoop) comes first.
+      renderLookAroundStage();
     }
   }
 
+  /* -------- Stage 3a: Contribute path (flavor menu) -------- */
   function renderContributePath() {
     const cards = FLAVORS.map(f => `
       <a class="card" href="${f.url}">
@@ -179,11 +202,36 @@
     `);
   }
 
+  /* -------- Stage 3b: Look-around (video + explanation, human path) -------- */
+  function renderLookAroundStage() {
+    const videoHtml = INTRO_VIDEO_ID
+      ? `<iframe src="https://www.youtube.com/embed/${INTRO_VIDEO_ID}" title="Digital Ice Cream — introduction" allowfullscreen></iframe>`
+      : `<div class="video-placeholder">
+           <div class="icon">▶</div>
+           <div class="label">Introduction video coming soon.</div>
+         </div>`;
+
+    setStage(`
+      <h2>Before you look around</h2>
+      <div class="video-frame">${videoHtml}</div>
+      <div class="explain">
+        <p>This short video explains what Digital Ice Cream is, how the Living Archive works, and why looking through it starts with a small purchase rather than a free browse.</p>
+        <p>That's a deliberate choice, not a barrier for its own sake: a real (if small) commitment is what separates genuine participation from passing curiosity, and it's what keeps this experiment legible as research rather than a public feed. One scoop — 650 HUF — is the smallest unit of that commitment.</p>
+        <p class="muted">Once you've had a scoop, the archive opens.</p>
+      </div>
+      <div class="cta-row">
+        <button class="cta" onclick="renderContributePath()">Get your first scoop →</button>
+      </div>
+      <p style="margin-top:16px"><a class="plain" href="javascript:reset()">← Back to the identity gate</a></p>
+    `);
+  }
+
+  /* -------- Stage 3c: AI Agent path -------- */
   function renderAiAgentPlaceholder() {
     setStage(`
       <div class="placeholder-panel">
         <h3>A machine-readable description of this Stand is available.</h3>
-        <p>Purchases here always require a human to complete Stripe's hosted checkout — there is no autonomous payment path, by design. An agent acting on a human's behalf can read the <a class="plain" href="agent-capability-manifest.json">Agent Capability Manifest</a> to understand what this Stand can do: discover its purpose, recommend a flavor, browse the archive, or help submit a contribution once a human has completed a purchase.</p>
+        <p>Purchases here always require a human to complete Stripe's hosted checkout — there is no autonomous payment path, by design. An agent acting on a human's behalf can read the <a class="plain" href="agent-capability-manifest.json">Agent Capability Manifest</a> to understand what this Stand can do: discover its purpose, recommend a flavor, see the objectives it serves and the collections it holds at a table-of-contents level, or help submit a contribution once a human has completed a purchase. It does not expose paid or full archive content.</p>
         <p style="margin-top:14px">If you are a human operator testing the AI-agent path — <a class="plain" href="javascript:reset()">go back to the identity gate</a>.</p>
       </div>
     `);

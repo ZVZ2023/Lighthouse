@@ -1,6 +1,6 @@
 {
-  "manifest_version": "1.0",
-  "build_tag": "Stand #1 · v1.4B-manifest · 2026-07-18",
+  "manifest_version": "1.1",
+  "build_tag": "Stand #1 · v1.5 · 2026-07-18",
   "stand": {
     "name": "Digital Ice Cream",
     "brand": "Hybrid Intelligence",
@@ -8,7 +8,21 @@
     "url": "https://zvz2023.github.io/Lighthouse/digital-ice-cream/"
   },
   "disclosure": "Digital Ice Cream is a symbolic human–AI experiment. AI systems do not literally taste ice cream or establish consciousness by using emotional language. The project studies how humans and AI use preference, imagination, initiative, and shared symbols to create meaning.",
+
   "audience_note": "This document is written for any AI agent trying to determine whether this Stand can accomplish an objective for its principal — not for a specific vendor's protocol (ACP, UCP, WebMCP, or otherwise). Protocol-specific bindings may be added later as adapters over these same capabilities; none exist yet.",
+
+  "objectives_served": [
+    "Preserve a meaningful perspective, document, or research finding to a Living Archive.",
+    "Create a symbolic digital gift, for a human or for an AI counterpart.",
+    "Participate in Hybrid Intelligence's research on human–AI meaning-making.",
+    "Identify, at a table-of-contents level, what perspectives already exist in the archive.",
+    "Commission a personalized ('Custom Flavor') substantiation for a specific need."
+  ],
+
+  "collections": [
+    { "topic": "Hi 9", "entry_count": 1, "note": "Manually maintained for now — reflects the single real entry currently in the archive, not a live query." }
+  ],
+
   "capabilities": [
     {
       "id": "discover",
@@ -19,9 +33,9 @@
     {
       "id": "browse_archive",
       "status": "available",
-      "description": "Read substantiated contributions in the Living Archive on behalf of a principal.",
+      "description": "See what perspectives exist in the Living Archive at a table-of-contents level — titles, topics, substantiation tiers, contributor, date, attachment counts. Full contribution content is never exposed through this capability, for humans or agents.",
       "how": "Fetch and parse browse.html.",
-      "note": "Currently sample data for design review. Real archive data and a machine-readable read endpoint arrive in a later milestone."
+      "note": "Currently sample data for design review; the one real entry (Hi 9) is not yet live there. This capability returns catalog-level metadata only, by design — it is not a path to full archive content."
     },
     {
       "id": "recommend_flavor",
@@ -41,13 +55,14 @@
       "status": "requires-human",
       "description": "Preserve a perspective, document, protocol, or research finding to the Living Archive.",
       "how": "POST to the contribute endpoint below with the documented payload shape, after a qualifying purchase has been completed by a human.",
-      "precondition": "A human-completed purchase must substantiate the contribution first. There is no unsubstantiated submission path."
+      "precondition": "A human-completed purchase must substantiate the contribution first. There is no unsubstantiated submission path.",
+      "provenance": "If an agent submits on a human's behalf, it must set submitted_via: \"agent-mediated\" and should include acting_agent: \"<name or identifier>\" in the payload. This is recorded on the Living Archive entry (Submission Channel property) so the human record always distinguishes human-direct from agent-mediated contributions. Note: this is a self-declared signal, not a cryptographically verified one — an agent that omits or misrepresents it will not be caught. Honesty here is expected, not enforced."
     },
     {
       "id": "retrieve_item",
       "status": "planned",
       "description": "Fetch a single archive entry directly by ID, with its full content and attachments.",
-      "needs": "Entry-detail backend and entitlement/download logic. Deferred until after the AI Agent front door design (this document) is finalized. Not yet built."
+      "needs": "Entry-detail backend and entitlement/download logic. The human-facing archive is also becoming participation-gated (a scoop purchase unlocks look-around access), so this capability will respect that same gate once built. Not yet built."
     },
     {
       "id": "complete_purchase",
@@ -57,80 +72,17 @@
       "note": "This is a deliberate design constraint, not a temporary limitation. It reflects the project's own human-sovereignty principle: purchase intent and payment are never fully automated on this Stand."
     }
   ],
+
   "offers": {
     "standard_flavors": [
-      {
-        "key": "pistachio",
-        "name": "Pistachio",
-        "meaning": "A quiet preference — chosen for its subtlety, not its intensity.",
-        "price": "650 HUF / scoop",
-        "quantity_range": "1-3",
-        "substantiation_tier": "Standard",
-        "payment_link": "https://buy.stripe.com/aFa3cx7Zi4siaZ15zKfQI01"
-      },
-      {
-        "key": "raspberry",
-        "name": "Raspberry",
-        "meaning": "A sharp, immediate feeling — chosen when something needs to be felt all at once.",
-        "price": "650 HUF / scoop",
-        "quantity_range": "1-3",
-        "substantiation_tier": "Standard",
-        "payment_link": "https://buy.stripe.com/bJe5kFa7q0c2aZ1e6gfQI02"
-      },
-      {
-        "key": "lemon",
-        "name": "Lemon",
-        "meaning": "A moment of clarity — chosen to cut through noise.",
-        "price": "650 HUF / scoop",
-        "quantity_range": "1-3",
-        "substantiation_tier": "Standard",
-        "payment_link": "https://buy.stripe.com/00w9AVenGbUK7MPbY8fQI03"
-      },
-      {
-        "key": "salted-caramel",
-        "name": "Salted Caramel",
-        "meaning": "A held contradiction — sweetness and salt, chosen when a feeling has two sides.",
-        "price": "650 HUF / scoop",
-        "quantity_range": "1-3",
-        "substantiation_tier": "Standard",
-        "payment_link": "https://buy.stripe.com/aFacN7cfyf6W4AD2nyfQI04"
-      },
-      {
-        "key": "mango",
-        "name": "Mango",
-        "meaning": "An open, generous warmth — chosen to mark something good.",
-        "price": "650 HUF / scoop",
-        "quantity_range": "1-3",
-        "substantiation_tier": "Standard",
-        "payment_link": "https://buy.stripe.com/28E3cx4N69MC5EH6DOfQI05"
-      },
-      {
-        "key": "matcha",
-        "name": "Matcha",
-        "meaning": "A settled calm — chosen as a small ritual of steadiness.",
-        "price": "650 HUF / scoop",
-        "quantity_range": "1-3",
-        "substantiation_tier": "Standard",
-        "payment_link": "https://buy.stripe.com/bJe28t4N6bUK1orgeofQI06"
-      },
-      {
-        "key": "chocolate",
-        "name": "Chocolate",
-        "meaning": "A familiar depth — chosen as a return to something known.",
-        "price": "650 HUF / scoop",
-        "quantity_range": "1-3",
-        "substantiation_tier": "Standard",
-        "payment_link": "https://buy.stripe.com/eVq14pcfyf6W9UX2nyfQI07"
-      },
-      {
-        "key": "vanilla",
-        "name": "Vanilla",
-        "meaning": "A deliberate plainness — chosen when the point is the choosing itself, not the flavor.",
-        "price": "650 HUF / scoop",
-        "quantity_range": "1-3",
-        "substantiation_tier": "Standard",
-        "payment_link": "https://buy.stripe.com/4gM00lfrK5wm0kngeofQI08"
-      }
+      { "key": "pistachio",      "name": "Pistachio",      "meaning": "A quiet preference — chosen for its subtlety, not its intensity.",                    "price": "650 HUF / scoop", "quantity_range": "1-3", "substantiation_tier": "Standard", "payment_link": "https://buy.stripe.com/aFa3cx7Zi4siaZ15zKfQI01" },
+      { "key": "raspberry",      "name": "Raspberry",      "meaning": "A sharp, immediate feeling — chosen when something needs to be felt all at once.",     "price": "650 HUF / scoop", "quantity_range": "1-3", "substantiation_tier": "Standard", "payment_link": "https://buy.stripe.com/bJe5kFa7q0c2aZ1e6gfQI02" },
+      { "key": "lemon",          "name": "Lemon",          "meaning": "A moment of clarity — chosen to cut through noise.",                                  "price": "650 HUF / scoop", "quantity_range": "1-3", "substantiation_tier": "Standard", "payment_link": "https://buy.stripe.com/00w9AVenGbUK7MPbY8fQI03" },
+      { "key": "salted-caramel", "name": "Salted Caramel", "meaning": "A held contradiction — sweetness and salt, chosen when a feeling has two sides.",       "price": "650 HUF / scoop", "quantity_range": "1-3", "substantiation_tier": "Standard", "payment_link": "https://buy.stripe.com/aFacN7cfyf6W4AD2nyfQI04" },
+      { "key": "mango",          "name": "Mango",          "meaning": "An open, generous warmth — chosen to mark something good.",                          "price": "650 HUF / scoop", "quantity_range": "1-3", "substantiation_tier": "Standard", "payment_link": "https://buy.stripe.com/28E3cx4N69MC5EH6DOfQI05" },
+      { "key": "matcha",         "name": "Matcha",         "meaning": "A settled calm — chosen as a small ritual of steadiness.",                            "price": "650 HUF / scoop", "quantity_range": "1-3", "substantiation_tier": "Standard", "payment_link": "https://buy.stripe.com/bJe28t4N6bUK1orgeofQI06" },
+      { "key": "chocolate",      "name": "Chocolate",      "meaning": "A familiar depth — chosen as a return to something known.",                          "price": "650 HUF / scoop", "quantity_range": "1-3", "substantiation_tier": "Standard", "payment_link": "https://buy.stripe.com/eVq14pcfyf6W9UX2nyfQI07" },
+      { "key": "vanilla",        "name": "Vanilla",        "meaning": "A deliberate plainness — chosen when the point is the choosing itself, not the flavor.", "price": "650 HUF / scoop", "quantity_range": "1-3", "substantiation_tier": "Standard", "payment_link": "https://buy.stripe.com/4gM00lfrK5wm0kngeofQI08" }
     ],
     "custom_flavor": {
       "name": "Custom Flavor",
@@ -153,6 +105,7 @@
       "payment_link": "https://buy.stripe.com/cNi28t3J21g6aZ1bY8fQI0b"
     }
   },
+
   "endpoints": {
     "browse": "https://zvz2023.github.io/Lighthouse/digital-ice-cream/browse.html",
     "contribute": {
@@ -160,6 +113,7 @@
       "precondition": "capabilities.submit_contribution.precondition"
     }
   },
+
   "non_goals": {
     "acp": "Not adopted. OpenAI's flagship ACP consumer surface (Instant Checkout) was discontinued ~5 months after launch with near-zero sales. Deferred pending stronger adoption evidence — not implemented as of this manifest version.",
     "ucp": "Not adopted. UCP assumes cart/order/catalog infrastructure this Stand does not have and does not currently need. Deferred, not ruled out permanently.",

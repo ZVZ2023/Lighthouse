@@ -1,4 +1,3 @@
-
 <!doctype html>
 <html lang="en">
 <head>
@@ -457,6 +456,7 @@
       preservation_consent: true,
       path: 'Guided Conversation',
       substantiation_type: 'Digital Ice Cream',
+      submitted_via: 'human-direct',
     };
 
     await submitToArchive(payload, 'conversation');
@@ -729,6 +729,7 @@
       path: 'Direct Contribution',
       substantiation_type: 'Digital Ice Cream',
       session_id: sessionId,
+      submitted_via: 'human-direct',
     };
 
     if (direct.files && direct.files.length > 0) {

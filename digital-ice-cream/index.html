@@ -107,6 +107,28 @@
 <script>
   const state = { identity: null, intent: null };
 
+  // An optional Barkóba purchase reference is invisible provenance. It changes
+  // neither the offer nor the checkout; Stripe records it as the hosted
+  // Checkout Session's client_reference_id for the signed webhook to recover.
+  const BARKOBA_PURCHASE_REF = (() => {
+    const raw = new URLSearchParams(window.location.search).get('purchase_ref');
+    if (!raw) return null;
+    const normalized = raw.trim().toUpperCase().replace(/[-\s]/g, '');
+    return /^[0-9A-HJKMNP-TV-Z]{16}$/.test(normalized) ? normalized : null;
+  })();
+
+  function checkoutUrl(url) {
+    if (!BARKOBA_PURCHASE_REF) return url;
+    const checkout = new URL(url);
+    checkout.searchParams.set('client_reference_id', BARKOBA_PURCHASE_REF);
+    // Stripe carries UTM parameters through a Payment Link redirect. The DICS
+    // completion page uses these to return only Barkóba-originated purchasers;
+    // ordinary Stand customers remain in the ordinary DICS experience.
+    checkout.searchParams.set('utm_source', 'barkoba');
+    checkout.searchParams.set('utm_content', BARKOBA_PURCHASE_REF);
+    return checkout.toString();
+  }
+
   // Fill in the YouTube video ID (the part after "v=" or after "youtu.be/")
   // when it's ready. Until then, the look-around stage shows a graceful
   // "video coming soon" placeholder — no other code changes needed.
@@ -202,7 +224,7 @@
   /* -------- Stage 3a: Contribute path (flavor menu) -------- */
   function renderContributePath() {
     const cards = FLAVORS.map(f => `
-      <a class="card" href="${f.url}">
+      <a class="card" href="${checkoutUrl(f.url)}">
         <div class="img" style="background-image:url('${f.img}')"></div>
         <h4>${f.name}</h4>
         <div class="price">650 HUF · 1 scoop</div>
@@ -213,15 +235,15 @@
       <div class="menu">${cards}</div>
       <p class="menu-note">Alternative offers:</p>
       <div class="menu">
-        <a class="card" href="${CUSTOM_URL}">
+        <a class="card" href="${checkoutUrl(CUSTOM_URL)}">
           <h4>Custom Flavor · €25</h4>
           <div class="price">Premium substantiation tier · human-curated · 24–72 h</div>
         </a>
-        <a class="card" href="${COMPANION_URL}">
+        <a class="card" href="${checkoutUrl(COMPANION_URL)}">
           <h4>For Your AI Companion</h4>
           <div class="price">Symbolic gift to an AI counterpart</div>
         </a>
-        <a class="card" href="${AI_CHOOSES_URL}">
+        <a class="card" href="${checkoutUrl(AI_CHOOSES_URL)}">
           <h4>AI Chooses a Flavor for You</h4>
           <div class="price">Let the Ice Cream Master pick for you</div>
         </a>
